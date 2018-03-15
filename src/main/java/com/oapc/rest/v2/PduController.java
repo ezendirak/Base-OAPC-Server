@@ -3,6 +3,7 @@ package com.oapc.rest.v2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.oapc.model.AtributsCombo;
 import com.oapc.model.ErrorRest;
 import com.oapc.model.PDU;
 import com.oapc.repo.PduRepository;
@@ -30,6 +31,7 @@ public class PduController {
     PduRepository pduRepository;
 
     private String[] taules = {"FAMILIA", "PRODUCTE", "SUBFAMILIA", "GRUP", "SUBGRUP", "COLORCARN", "QUALITAT", "CALIBRE"};
+    private String[] combos = {"COLORCARN", "VARIETAT", "QUALITAT", "CALIBRE"};
     private String taulaTrobada;
     private String keyTrobada;
     
@@ -176,6 +178,130 @@ public class PduController {
 		}
     	return productes;
     }
+    
+    @Transactional(readOnly = true)
+    @GetMapping("/pdu/combos/{tipusProducte}")
+    public AtributsCombo getCombos(@PathVariable(value = "tipusProducte") String tipusProducte){
+    	
+    	AtributsCombo atributsCombo = new AtributsCombo(); 
+    	Stream<PDU> product = pduRepository.getProducteByDades("PRODUCTE", tipusProducte.replaceAll("\"",""));
+    	//String producteKey = product.collect(Collectors.toList()).get(0).getClave();
+    	List<String> atributs = new ArrayList<String>();
+    	for (PDU atribut : product.collect(Collectors.toList())) {
+			atributs.add(atribut.getClave());
+		}
+    	String producteKey = atributs.get(0);
+    	for (String atribut : combos) {
+    		
+    		switch (atribut) {
+    		case "COLORCARN":
+    			List<String> colorsCarns = new ArrayList<String>();
+    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+					colorsCarns.add(regis.getDatos());
+				}
+    				atributsCombo.setColorsCarn(colorsCarns);
+    			break;
+    		case "VARIETAT":
+    			List<String> varietats = new ArrayList<String>();
+    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+    				varietats.add(regis.getDatos());
+				}
+    				atributsCombo.setVarietats(varietats);
+    			break;
+    		case "QUALITAT":
+    			List<String> qualitats = new ArrayList<String>();
+    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+    				qualitats.add(regis.getDatos());
+				}
+    				atributsCombo.setQualitats(qualitats);
+    			break;
+    		case "CALIBRE":
+    			List<String> calibres = new ArrayList<String>();
+    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+    				calibres.add(regis.getDatos());
+				}
+    				atributsCombo.setCalibres(calibres);
+    			break;
+    		}
+		}
+    	return atributsCombo;
+    }
+    
+//    @Transactional(readOnly = true)
+//    @GetMapping("/pdu/colorcarn/{tipusProducte}")
+//    public List<String> getColorCarn(@PathVariable(value = "tipusProducte") String tipusProducte){
+//    	
+//    	Stream<PDU> product = pduRepository.getProducteByDades("PRODUCTE", tipusProducte);
+//    	String producteKey = product.collect(Collectors.toList()).get(0).getClave();
+//    	
+//    	Stream<PDU> pduStream = pduRepository.getDades("COLORCARN", producteKey);
+//    	List<String> productes = new ArrayList<String>();
+//    	for (PDU registre : pduStream.collect(Collectors.toList())) {
+//			productes.add(registre.getDatos());
+//		}
+//    	return productes;
+//    }
+//    
+//    @Transactional(readOnly = true)
+//    @GetMapping("/pdu/varietat/{tipusProducte}")
+//    public List<String> getVarietat(@PathVariable(value = "tipusProducte") String tipusProducte){
+//    	
+//    	Stream<PDU> product = pduRepository.getProducteByDades("PRODUCTE", tipusProducte);
+//    	String producteKey = product.collect(Collectors.toList()).get(0).getClave();
+//    	
+//    	Stream<PDU> pduStream = pduRepository.getDades("VARIETAT", producteKey);
+//    	List<String> productes = new ArrayList<String>();
+//    	for (PDU registre : pduStream.collect(Collectors.toList())) {
+//			productes.add(registre.getDatos());
+//		}
+//    	return productes;
+//    }
+//    
+//    @Transactional(readOnly = true)
+//    @GetMapping("/pdu/qualitat/{tipusProducte}")
+//    public List<String> getQualitat(@PathVariable(value = "tipusProducte") String tipusProducte){
+//    	
+//    	Stream<PDU> product = pduRepository.getProducteByDades("PRODUCTE", tipusProducte);
+//    	String producteKey = product.collect(Collectors.toList()).get(0).getClave();
+//    	
+//    	Stream<PDU> pduStream = pduRepository.getDades("QUALITAT", producteKey);
+//    	List<String> productes = new ArrayList<String>();
+//    	for (PDU registre : pduStream.collect(Collectors.toList())) {
+//			productes.add(registre.getDatos());
+//		}
+//    	return productes;
+//    }
+//    
+//    @Transactional(readOnly = true)
+//    @GetMapping("/pdu/calibre/{tipusProducte}")
+//    public List<String> getCalibre(@PathVariable(value = "tipusProducte") String tipusProducte){
+//    	
+//    	Stream<PDU> product = pduRepository.getProducteByDades("PRODUCTE", tipusProducte);
+//    	String producteKey = product.collect(Collectors.toList()).get(0).getClave();
+//    	
+//    	Stream<PDU> pduStream = pduRepository.getDades("CALIBRE", producteKey);
+//    	List<String> productes = new ArrayList<String>();
+//    	for (PDU registre : pduStream.collect(Collectors.toList())) {
+//			productes.add(registre.getDatos());
+//		}
+//    	return productes;
+//    }
+//    @Transactional(readOnly = true)
+//    @GetMapping("/pdu/prova")
+//    public List<List<String>> getProva(){
+//    	
+//    	List<List<String>> productes = new ArrayList<List<String>>();
+//    	List<String> test = new ArrayList<String>();
+//    	List<String> test2 = new ArrayList<String>();
+//    	test.add("siuuu");
+//    	test.add("skrrr");
+//    	test2.add("segon lloc");
+//    	test2.add("nonono pesad");
+//    	productes.add(test);
+//    	productes.add(test2);
+//    	
+//    	return productes;
+//    }
     
     
 
