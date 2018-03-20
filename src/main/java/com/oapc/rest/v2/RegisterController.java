@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import static org.assertj.core.api.Assertions.filter;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -165,15 +167,35 @@ public class RegisterController {
     	return registreRepository.findAll();        
     }
 
-//    @GetMapping("/fromFiltro/{color}")
-//    public ResponseEntity<Note> getNoteById(@PathVariable(value = "color") String color) {
-//    	
-//        Note note = colorRepository.findOne(color);
-//        if(note == null) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        return ResponseEntity.ok().body(note);
-//    }
+    @Transactional(readOnly = true)
+    @GetMapping("/filtro")
+    public List<Register> getRegistresFiltrats(@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat)	    		    		    	
+    {    	    	 
+//    	 Stream<Register> registresTotals = registreRepository.findAllStream();
+    	 List<Register> registresTotals = registreRepository.findAll();
+    	 if (registresTotals != null && tipusProducte != null) {
+    		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
+    		 
+    		 if (colorCarn != null) {
+    				 registresTotals = registresTotals.stream().filter(x -> x.getColorCarn().equals(colorCarn)).collect(Collectors.toList());
+    	    	}
+    		 
+    		 if (qualitat != null) {
+    			 
+    				 registresTotals = registresTotals.stream().filter(x -> x.getQualitat().equals(qualitat)).collect(Collectors.toList());
+    			}
+    		 
+    		 if (calibre != null) {
+    				 registresTotals = registresTotals.stream().filter(x -> x.getCalibre().equals(calibre)).collect(Collectors.toList()); 
+    			}
+    		 
+    		 if (varietat != null) {
+    				 registresTotals = registresTotals.stream().filter(x -> x.getVarietat().equals(varietat)).collect(Collectors.toList());	
+    			}
+    	 }
+    	 return registresTotals;     
+//    	 return registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
+    }
     
     
 

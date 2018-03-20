@@ -1,12 +1,16 @@
 package com.oapc.model;
 
 import javax.persistence.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //@Entity
 //@Table(name = "atributsCombo")
 public class AtributsCombo {
 
+//    private List<String> ColorsCarn;
     private List<String> ColorsCarn;
 
     private List<String> Qualitats;
@@ -46,6 +50,9 @@ public class AtributsCombo {
 	public void setVarietats(List<String> varietats) {
 		Varietats = varietats;
 	}
+
+
+	
     
 
 }
