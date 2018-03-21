@@ -197,7 +197,93 @@ public class RegisterController {
 //    	 return registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
     }
     
+    @Transactional(readOnly = true)
+    @GetMapping("/registresFiltrat")
+    public ResponseEntity<?> getRegistresFiltratsPaginats(@RequestParam(value="page",     defaultValue="0") String spage,
+    		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat)	    		    		    	
+    {    	    	 
+//    	 Stream<Register> registresTotals = registreRepository.findAllStream();
+    	 List<Register> registresTotals = registreRepository.findAll();
+    	 if (registresTotals != null && tipusProducte != null) {
+    		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
+    		 
+    		 if (colorCarn != null) {
+    				 registresTotals = registresTotals.stream().filter(x -> x.getColorCarn().equals(colorCarn)).collect(Collectors.toList());
+    	    	}
+    		 
+    		 if (qualitat != null) {
+    			 
+    				 registresTotals = registresTotals.stream().filter(x -> x.getQualitat().equals(qualitat)).collect(Collectors.toList());
+    			}
+    		 
+    		 if (calibre != null) {
+    				 registresTotals = registresTotals.stream().filter(x -> x.getCalibre().equals(calibre)).collect(Collectors.toList()); 
+    			}
+    		 
+    		 if (varietat != null) {
+    				 registresTotals = registresTotals.stream().filter(x -> x.getVarietat().equals(varietat)).collect(Collectors.toList());	
+    			}
+    	 }
+    	 
+    	 
+    	 Integer page      = Integer.parseInt(spage);
+   	 	 Integer per_page  = Integer.parseInt(sper_page);
+   	 	 
+	     if (page == 0)
+	    	 return new ResponseEntity<ErrorRest> (new ErrorRest("page not defined"), HttpStatus.BAD_REQUEST);
+   	 	     	    	
+	     if (per_page == 0)
+	    	 return new ResponseEntity<ErrorRest> (new ErrorRest("per_page not defined"), HttpStatus.BAD_REQUEST);	     
+	     //
+//    	 Stream<Register> stream_cont = registreRepository.findAllStream();
+    	 
+//    	 Long    total_reg = stream_cont.count();
+    	 Long    total_reg = registresTotals.stream().count();
+    	 Long    page_max  = (total_reg / per_page) + 1;
+    	 Integer skip_reg  = (page - 1) * per_page;    	 
+	     	     	     	     
+	     if (page > page_max)
+	    	 return new ResponseEntity<ErrorRest> (new ErrorRest("page > page_max"), HttpStatus.BAD_REQUEST);
+    	
+    	 //
+//    	 Stream<Register> stream_data = registreRepository.findAllStream();    	     	     	
+	     
+	     logger.info("page=" + page.toString() + ",page_max=" + page_max.toString() + ",per_page=" + per_page.toString() + ",total_reg=" +  total_reg.toString());	    
+	    	    	     
+	     if (page == 0)	    	
+	    	 return new ResponseEntity<List<Register>> (registresTotals.stream().collect(Collectors.toList()), HttpStatus.OK); 
+	     else 
+		     return new ResponseEntity<List<Register>> (registresTotals.stream().skip(skip_reg).limit(per_page).collect(Collectors.toList()), HttpStatus.OK);
+    	 
+    }
     
-
-
+    @Transactional(readOnly = true)
+    @GetMapping("/registres_countFiltrat")
+    public Long getRegisterCountFiltrat(@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat)	    		    		    	
+    {    
+    	
+    	 List<Register> registresTotals = registreRepository.findAll();
+    	 if (registresTotals != null && tipusProducte != null) {
+    		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
+    		 
+    		 if (colorCarn != null) {
+    				 registresTotals = registresTotals.stream().filter(x -> x.getColorCarn().equals(colorCarn)).collect(Collectors.toList());
+    	    	}
+    		 
+    		 if (qualitat != null) {
+    			 
+    				 registresTotals = registresTotals.stream().filter(x -> x.getQualitat().equals(qualitat)).collect(Collectors.toList());
+    			}
+    		 
+    		 if (calibre != null) {
+    				 registresTotals = registresTotals.stream().filter(x -> x.getCalibre().equals(calibre)).collect(Collectors.toList()); 
+    			}
+    		 
+    		 if (varietat != null) {
+    				 registresTotals = registresTotals.stream().filter(x -> x.getVarietat().equals(varietat)).collect(Collectors.toList());	
+    			}
+    	 }
+    	 
+    	 return registresTotals.stream().count();
+    }
 }
