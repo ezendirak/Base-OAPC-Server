@@ -206,22 +206,10 @@ public class RegisterController {
     	 if (registresTotals != null && (tipusProducte != null && !tipusProducte.isEmpty())) {
     		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
     		 
-    		 if (colorCarn != null) {
-    				 registresTotals = registresTotals.stream().filter(x -> x.getColorCarn().equals(colorCarn)).collect(Collectors.toList());
-    	    	}
+    		 registresTotals = filtrarAtributs(colorCarn, qualitat, calibre, varietat, registresTotals);
     		 
-    		 if (qualitat != null) {
-    			 
-    				 registresTotals = registresTotals.stream().filter(x -> x.getQualitat().equals(qualitat)).collect(Collectors.toList());
-    			}
-    		 
-    		 if (calibre != null) {
-    				 registresTotals = registresTotals.stream().filter(x -> x.getCalibre().equals(calibre)).collect(Collectors.toList()); 
-    			}
-    		 
-    		 if (varietat != null) {
-    				 registresTotals = registresTotals.stream().filter(x -> x.getVarietat().equals(varietat)).collect(Collectors.toList());	
-    			}
+    	 }else if (registresTotals != null && tipusProducte == null) {
+    		 registresTotals = filtrarAtributs(colorCarn, qualitat, calibre, varietat, registresTotals);
     	 }
     	 
     	 
@@ -265,24 +253,34 @@ public class RegisterController {
     	 if (registresTotals != null && (tipusProducte != null && !tipusProducte.isEmpty())) {
     		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
     		 
-    		 if (colorCarn != null) {
-    				 registresTotals = registresTotals.stream().filter(x -> x.getColorCarn().equals(colorCarn)).collect(Collectors.toList());
-    	    	}
+    		 registresTotals = filtrarAtributs(colorCarn, qualitat, calibre, varietat, registresTotals);
     		 
-    		 if (qualitat != null) {
-    			 
-    				 registresTotals = registresTotals.stream().filter(x -> x.getQualitat().equals(qualitat)).collect(Collectors.toList());
-    			}
-    		 
-    		 if (calibre != null) {
-    				 registresTotals = registresTotals.stream().filter(x -> x.getCalibre().equals(calibre)).collect(Collectors.toList()); 
-    			}
-    		 
-    		 if (varietat != null) {
-    				 registresTotals = registresTotals.stream().filter(x -> x.getVarietat().equals(varietat)).collect(Collectors.toList());	
-    			}
+    	 }else if(registresTotals != null && tipusProducte == null) {
+    		 registresTotals = filtrarAtributs(colorCarn, qualitat, calibre, varietat, registresTotals);
     	 }
     	 
     	 return registresTotals.stream().count();
+    }
+    
+    public List<Register> filtrarAtributs(String colorCarn, String qualitat, String calibre, String varietat, List<Register> registresTotals){
+    	
+    	
+    	if (colorCarn != null) {
+			 registresTotals = registresTotals.stream().filter(x -> x.getColorCarn().equals(colorCarn)).collect(Collectors.toList());
+    	}
+	 
+    	if (qualitat != null) {
+		 
+			 registresTotals = registresTotals.stream().filter(x -> x.getQualitat().equals(qualitat)).collect(Collectors.toList());
+		}
+	 
+	 if (calibre != null) {
+			 registresTotals = registresTotals.stream().filter(x -> x.getCalibre().equals(calibre)).collect(Collectors.toList()); 
+		}
+	 
+	 if (varietat != null) {
+			 registresTotals = registresTotals.stream().filter(x -> x.getVarietat().equals(varietat)).collect(Collectors.toList());	
+		}
+	 return registresTotals;
     }
 }
