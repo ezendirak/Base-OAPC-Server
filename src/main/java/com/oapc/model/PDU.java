@@ -20,7 +20,7 @@ public class PDU {
     private Integer cont;    
     
 	//Per la taula PRODUCTES, l'estructura de dades es: 0-24 => Nom del producte, 25-26 => Familia, 27-29 => SubFamilia, 30-31 => Grup, 32-33 => Subgrup
-	//Exemple pel pressec, camp datos => "Pressec                  PAPAGFRPI", Producte Agrari => Agricola => Fruita => Pinyol => Préssec.
+	//Exemple pel pressec, camp datos => "Pressec                  PAPAGFRPI", Producte Agrari => Agricola => Fruita => Pinyol => Pressec.
     @Column(name="DATOS", length=200)
     private String  datos;
 

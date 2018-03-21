@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static org.assertj.core.api.Assertions.filter;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -173,7 +172,7 @@ public class RegisterController {
     {    	    	 
 //    	 Stream<Register> registresTotals = registreRepository.findAllStream();
     	 List<Register> registresTotals = registreRepository.findAll();
-    	 if (registresTotals != null && tipusProducte != null) {
+    	 if (registresTotals != null && (tipusProducte != null && !tipusProducte.isEmpty())) {
     		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
     		 
     		 if (colorCarn != null) {
@@ -204,7 +203,7 @@ public class RegisterController {
     {    	    	 
 //    	 Stream<Register> registresTotals = registreRepository.findAllStream();
     	 List<Register> registresTotals = registreRepository.findAll();
-    	 if (registresTotals != null && tipusProducte != null) {
+    	 if (registresTotals != null && (tipusProducte != null && !tipusProducte.isEmpty())) {
     		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
     		 
     		 if (colorCarn != null) {
@@ -263,7 +262,7 @@ public class RegisterController {
     {    
     	
     	 List<Register> registresTotals = registreRepository.findAll();
-    	 if (registresTotals != null && tipusProducte != null) {
+    	 if (registresTotals != null && (tipusProducte != null && !tipusProducte.isEmpty())) {
     		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
     		 
     		 if (colorCarn != null) {

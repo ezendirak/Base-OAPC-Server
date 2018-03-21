@@ -132,21 +132,6 @@ public class PduController {
 		this.keyTrobada = keyTrobada;
 	}
     
-//    @Transactional(readOnly = true)
-//    @GetMapping("/fromFiltro")
-//    public List<Pdu> getAllColors2(@RequestParam(value = "color", required=false) String color, @RequestParam(value="diametre", required=false) Long diametre) {
-//    	Stream<Pdu> producteStream = pduRepository.findAllStream();
-//    	logger.info("Color: " + color + ", Diametre: "+ diametre);
-//    	
-//    	if (color != null) {
-//    		producteStream = producteStream.filter(x -> x.getColor().equals(color));	
-//    	}
-//    	if(diametre != null){
-//    		producteStream = producteStream.filter(x -> x.getDiametre().equals(diametre));
-//    	}
-//    	return producteStream.collect(Collectors.toList());
-//    } 
-    
     @GetMapping("/registres")
     public List<PDU> getAllProducts() {
     	return pduRepository.findAll();        
@@ -175,8 +160,10 @@ public class PduController {
     	String vacio = "";
     	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
     	List<String> productes = new ArrayList<String>();
+    	productes.add("");
     	for (PDU registre : pduStream.collect(Collectors.toList())) {
-			productes.add(registre.getDatos().substring(0, 25).trim());
+//			productes.add(registre.getDatos().substring(0, 25).trim());
+			productes.add(registre.getClave());
 		}
     	return productes;
     }
@@ -186,43 +173,82 @@ public class PduController {
     public AtributsCombo getCombos(@PathVariable(value = "tipusProducte") String tipusProducte){
     	
     	AtributsCombo atributsCombo = new AtributsCombo(); 
-    	Stream<PDU> product = pduRepository.getProducteByDades("PRODUCTE", tipusProducte.replaceAll("\"",""));
+    	Stream<PDU> product = pduRepository.getDades("PRODUCTE", tipusProducte.replaceAll("\"",""));
     	//String producteKey = product.collect(Collectors.toList()).get(0).getClave();
     	List<String> atributs = new ArrayList<String>();
     	for (PDU atribut : product.collect(Collectors.toList())) {
 			atributs.add(atribut.getClave());
 		}
-    	String producteKey = atributs.get(0);
+    	
+    	
+    	
+    	if (atributs.size() > 1) {
+    		List<String> producteKey = new ArrayList<String>();
+    		for (String producte : atributs) {
+				producteKey.add(producte);
+			}
+    		atributsCombo = combosSenseProducte(producteKey, atributsCombo);
+    	}else {
+    		String producteKey= atributs.get(0);
+    		atributsCombo = combosAmbProducte(producteKey, atributsCombo);
+    	}
+    	
+    	
+    	return atributsCombo;
+    }
+    
+    public AtributsCombo combosSenseProducte(List<String> productesKey, AtributsCombo atributsCombo){
+    	
     	for (String atribut : combos) {
     		
     		switch (atribut) {
     		case "COLORCARN":
-//    			List<String> colorsCarns = new ArrayList<String>();
     			List<String> colorsCarns = new ArrayList<String>();
-    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
-					colorsCarns.add(regis.getClave());
+    			colorsCarns.add("");
+    			for (String producteKey : productesKey) {
+    				for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+						if (!colorsCarns.contains(regis.getClave().substring(producteKey.length()))) {
+							colorsCarns.add(regis.getClave().substring(producteKey.length()));
+						}
+					}
 				}
-    				atributsCombo.setColorsCarn(colorsCarns);
+    			
+    			atributsCombo.setColorsCarn(colorsCarns);
     			break;
     		case "VARIETAT":
     			List<String> varietats = new ArrayList<String>();
-    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
-    				varietats.add(regis.getClave());
-				}
+    			varietats.add("");
+    			for (String producteKey : productesKey) {
+	    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+	    				if (!varietats.contains("VA"+regis.getClave().substring(producteKey.length()))) {
+	    					varietats.add("VA"+regis.getClave().substring(producteKey.length()));
+	    				}
+					}
+    			}
     				atributsCombo.setVarietats(varietats);
     			break;
     		case "QUALITAT":
     			List<String> qualitats = new ArrayList<String>();
-    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
-    				qualitats.add(regis.getClave());
-				}
+    			qualitats.add("");
+    			for (String producteKey : productesKey) {
+	    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+	    				if (!qualitats.contains("QU"+regis.getClave().substring(producteKey.length()))) {
+	    					qualitats.add("QU"+regis.getClave().substring(producteKey.length()));
+	    				}
+					}
+    			}
     				atributsCombo.setQualitats(qualitats);
     			break;
     		case "CALIBRE":
     			List<String> calibres = new ArrayList<String>();
-    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
-    				calibres.add(regis.getClave());
-				}
+    			calibres.add("");
+    			for (String producteKey : productesKey) {
+	    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+	    				if (!calibres.contains("CA"+regis.getClave().substring(producteKey.length()))) {
+	    					calibres.add("CA"+regis.getClave().substring(producteKey.length()));
+	    				}
+					}
+    			}
     				atributsCombo.setCalibres(calibres);
     			break;
     		}
@@ -230,6 +256,42 @@ public class PduController {
     	return atributsCombo;
     }
     
+    public AtributsCombo combosAmbProducte(String producteKey, AtributsCombo atributsCombo) {
+    	for (String atribut : combos) {
+    		
+    		switch (atribut) {
+    		case "COLORCARN":
+    			List<String> colorsCarns = new ArrayList<String>();
+    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+    				
+					colorsCarns.add(regis.getClave().substring(producteKey.length()));
+				}
+    				atributsCombo.setColorsCarn(colorsCarns);
+    			break;
+    		case "VARIETAT":
+    			List<String> varietats = new ArrayList<String>();
+    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+    				varietats.add("VA"+regis.getClave().substring(producteKey.length()));
+				}
+    			break;
+    		case "QUALITAT":
+    			List<String> qualitats = new ArrayList<String>();
+    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+    				qualitats.add("QU"+regis.getClave().substring(producteKey.length()));
+				}
+    				atributsCombo.setQualitats(qualitats);
+    			break;
+    		case "CALIBRE":
+    			List<String> calibres = new ArrayList<String>();
+    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+    				calibres.add("CA"+regis.getClave().substring(producteKey.length()));
+				}
+    				atributsCombo.setCalibres(calibres);
+    			break;
+    		}
+		}
+    	return atributsCombo;
+    }
 //    @Transactional(readOnly = true)
 //    @GetMapping("/pdu/combos/{tipusProducte}")
 //    public AtributsCombo getCombos(@PathVariable(value = "tipusProducte") String tipusProducte){
