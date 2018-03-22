@@ -175,22 +175,27 @@ public class RegisterController {
     	 if (registresTotals != null && (tipusProducte != null && !tipusProducte.isEmpty())) {
     		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
     		 
-    		 if (colorCarn != null) {
-    				 registresTotals = registresTotals.stream().filter(x -> x.getColorCarn().equals(colorCarn)).collect(Collectors.toList());
-    	    	}
+    		
+    		registresTotals = registresTotals.stream()
+    				              .filter(x -> colorCarn == null || x.getColorCarn().equals(colorCarn))
+    				              .filter(x -> qualitat  == null || x.getQualitat().equals(qualitat))
+    				              .filter(x -> calibre   == null || x.getCalibre().equals(calibre))
+    				              .filter(x -> varietat  == null || x.getVarietat().equals(varietat))
+    				              .collect(Collectors.toList());
+    	   
     		 
-    		 if (qualitat != null) {
-    			 
-    				 registresTotals = registresTotals.stream().filter(x -> x.getQualitat().equals(qualitat)).collect(Collectors.toList());
-    			}
-    		 
-    		 if (calibre != null) {
-    				 registresTotals = registresTotals.stream().filter(x -> x.getCalibre().equals(calibre)).collect(Collectors.toList()); 
-    			}
-    		 
-    		 if (varietat != null) {
-    				 registresTotals = registresTotals.stream().filter(x -> x.getVarietat().equals(varietat)).collect(Collectors.toList());	
-    			}
+//    		 if (qualitat != null) { 
+//    			 
+//    				 registresTotals = registresTotals.stream().filter(x -> qualitat == null ||x.getQualitat().equals(qualitat)).collect(Collectors.toList());
+//    			}
+//    		 
+//    		 if (calibre != null) {
+//    				 registresTotals = registresTotals.stream().filter(x -> calibre == null || x.getCalibre().equals(calibre)).collect(Collectors.toList()); 
+//    			}
+//    		 
+//    		 if (varietat != null) {
+//    				 registresTotals = registresTotals.stream().filter(x -> varietat == null || x.getVarietat().equals(varietat)).collect(Collectors.toList());	
+//    			}
     	 }
     	 return registresTotals;     
 //    	 return registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
@@ -230,18 +235,17 @@ public class RegisterController {
     	 Integer skip_reg  = (page - 1) * per_page;    	 
 	     	     	     	     
 	     if (page > page_max)
-	    	 return new ResponseEntity<ErrorRest> (new ErrorRest("page > page_max"), HttpStatus.BAD_REQUEST);
+	    	 return new ResponseEntity<ErrorRest > (new ErrorRest("page > page_max"), HttpStatus.BAD_REQUEST);
     	
     	 //
 //    	 Stream<Register> stream_data = registreRepository.findAllStream();    	     	     	
 	     
 	     logger.info("page=" + page.toString() + ",page_max=" + page_max.toString() + ",per_page=" + per_page.toString() + ",total_reg=" +  total_reg.toString());	    
-	    	    	     
+	        	     
 	     if (page == 0)	    	
 	    	 return new ResponseEntity<List<Register>> (registresTotals.stream().collect(Collectors.toList()), HttpStatus.OK); 
 	     else 
 		     return new ResponseEntity<List<Register>> (registresTotals.stream().skip(skip_reg).limit(per_page).collect(Collectors.toList()), HttpStatus.OK);
-    	 
     }
     
     @Transactional(readOnly = true)
@@ -264,23 +268,13 @@ public class RegisterController {
     
     public List<Register> filtrarAtributs(String colorCarn, String qualitat, String calibre, String varietat, List<Register> registresTotals){
     	
+    	registresTotals = registresTotals.stream()
+	              .filter(x -> colorCarn == null || x.getColorCarn().equals(colorCarn))
+	              .filter(x -> qualitat  == null || x.getQualitat().equals(qualitat))
+	              .filter(x -> calibre   == null || x.getCalibre().equals(calibre))
+	              .filter(x -> varietat  == null || x.getVarietat().equals(varietat))
+	              .collect(Collectors.toList());
     	
-    	if (colorCarn != null) {
-			 registresTotals = registresTotals.stream().filter(x -> x.getColorCarn().equals(colorCarn)).collect(Collectors.toList());
-    	}
-	 
-    	if (qualitat != null) {
-		 
-			 registresTotals = registresTotals.stream().filter(x -> x.getQualitat().equals(qualitat)).collect(Collectors.toList());
-		}
-	 
-	 if (calibre != null) {
-			 registresTotals = registresTotals.stream().filter(x -> x.getCalibre().equals(calibre)).collect(Collectors.toList()); 
-		}
-	 
-	 if (varietat != null) {
-			 registresTotals = registresTotals.stream().filter(x -> x.getVarietat().equals(varietat)).collect(Collectors.toList());	
-		}
 	 return registresTotals;
     }
 }
