@@ -169,6 +169,18 @@ public class PduController {
     }
     
     @Transactional(readOnly = true)
+    @GetMapping("/pdu/productesModal")
+    public List<String> getProductsNameForModal(){
+    	String vacio = "";
+    	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
+    	List<String> productes = new ArrayList<String>();
+    	for (PDU registre : pduStream.collect(Collectors.toList())) {
+			productes.add(registre.getClave());
+		}
+    	return productes;
+    }
+    
+    @Transactional(readOnly = true)
     @GetMapping("/pdu/combos/{tipusProducte}")
     public AtributsCombo getCombos(@PathVariable(value = "tipusProducte") String tipusProducte){
     	

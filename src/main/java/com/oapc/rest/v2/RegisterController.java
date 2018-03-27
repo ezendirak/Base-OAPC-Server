@@ -208,14 +208,8 @@ public class RegisterController {
     {    	    	 
 //    	 Stream<Register> registresTotals = registreRepository.findAllStream();
     	 List<Register> registresTotals = registreRepository.findAll();
-    	 if (registresTotals != null && (tipusProducte != null && !tipusProducte.isEmpty())) {
-    		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
-    		 
-    		 registresTotals = filtrarAtributs(colorCarn, qualitat, calibre, varietat, registresTotals);
-    		 
-    	 }else if (registresTotals != null && tipusProducte == null) {
-    		 registresTotals = filtrarAtributs(colorCarn, qualitat, calibre, varietat, registresTotals);
-    	 }
+    	 
+    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, registresTotals);
     	 
     	 
     	 Integer page      = Integer.parseInt(spage);
@@ -254,25 +248,20 @@ public class RegisterController {
     {    
     	
     	 List<Register> registresTotals = registreRepository.findAll();
-    	 if (registresTotals != null && (tipusProducte != null && !tipusProducte.isEmpty())) {
-    		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
-    		 
-    		 registresTotals = filtrarAtributs(colorCarn, qualitat, calibre, varietat, registresTotals);
-    		 
-    	 }else if(registresTotals != null && tipusProducte == null) {
-    		 registresTotals = filtrarAtributs(colorCarn, qualitat, calibre, varietat, registresTotals);
-    	 }
     	 
+    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, registresTotals);
+    	
     	 return registresTotals.stream().count();
     }
     
-    public List<Register> filtrarAtributs(String colorCarn, String qualitat, String calibre, String varietat, List<Register> registresTotals){
+    public List<Register> filtrarAtributs(String tipusProducte, String colorCarn, String qualitat, String calibre, String varietat, List<Register> registresTotals){
     	
     	registresTotals = registresTotals.stream()
-	              .filter(x -> colorCarn == null || x.getColorCarn().equals(colorCarn))
-	              .filter(x -> qualitat  == null || x.getQualitat().equals(qualitat))
-	              .filter(x -> calibre   == null || x.getCalibre().equals(calibre))
-	              .filter(x -> varietat  == null || x.getVarietat().equals(varietat))
+    			  .filter(x -> tipusProducte == null || x.getTipusProducte().equals(tipusProducte))
+	              .filter(x -> colorCarn     == null || x.getColorCarn().equals(colorCarn))
+	              .filter(x -> qualitat  == null     || x.getQualitat().equals(qualitat))
+	              .filter(x -> calibre   == null     || x.getCalibre().equals(calibre))
+	              .filter(x -> varietat  == null     || x.getVarietat().equals(varietat))
 	              .collect(Collectors.toList());
     	
 	 return registresTotals;
