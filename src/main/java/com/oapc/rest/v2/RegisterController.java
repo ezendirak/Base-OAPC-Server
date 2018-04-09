@@ -106,30 +106,38 @@ public class RegisterController {
         return registreRepository.save(note);
     }
 
-    @PutMapping("/registres/{id}")
-    public ResponseEntity<Register> updateRegister(@PathVariable(value = "id") Long noteId,
-                                           @Valid @RequestBody Register registerDetails) {
+    @PutMapping("/registres")
+    public ResponseEntity<Register> updateRegister(@Valid @RequestBody Register registerDetails) {
     	
-    	Register registre = registreRepository.findOne(noteId);
+    	Register registre = registreRepository.findOne(registerDetails.getId());
+    	
         if(registre == null) {
             return ResponseEntity.notFound().build();
         }
-        
-//        registre.setPeriode(registerDetails.getPeriode());
-//        registre.setTipusProducte(registerDetails.getTipusProducte());
-//        
-//        if (registerDetails.getColorCarn()!=null) {
-//        	registre.setColorCarn(registerDetails.getColorCarn());
-//        }
-//        if (registerDetails.getVarietat()!=null) {
-//        	registre.setVarietat(registerDetails.getVarietat());
-//        }
-//                
-//        registre.setCalibre(registerDetails.getCalibre());
-//        registre.setQualitat(registerDetails.getQualitat());
-//        registre.setPreuSortida(registerDetails.getPreuSortida());
-//        registre.setQuantitatVenuda(registerDetails.getQuantitatVenuda());
-
+        if (registerDetails.getPeriode()!=null) {
+        	registre.setPeriode(registerDetails.getPeriode());
+        }
+        if (registerDetails.getTipusProducte()!=null) {
+        	registre.setTipusProducte(registerDetails.getTipusProducte());
+        }
+        if (registerDetails.getColorCarn()!=null) {
+        	registre.setColorCarn(registerDetails.getColorCarn());
+        }
+        if (registerDetails.getVarietat()!=null) {
+        	registre.setVarietat(registerDetails.getVarietat());
+        }
+        if (registerDetails.getCalibre()!=null) {       
+        	registre.setCalibre(registerDetails.getCalibre());
+        }
+        if (registerDetails.getQualitat()!=null) {
+        	registre.setQualitat(registerDetails.getQualitat());
+        }
+        if (registerDetails.getPreuSortida()!=null) {
+        	registre.setPreuSortida(registerDetails.getPreuSortida());
+        }
+        if (registerDetails.getQuantitatVenuda()!=null) {
+        	registre.setQuantitatVenuda(registerDetails.getQuantitatVenuda());
+        }
         
         Register updatedRegistre = registreRepository.save(registre);
         return ResponseEntity.ok(updatedRegistre);
@@ -182,23 +190,8 @@ public class RegisterController {
     				              .filter(x -> calibre   == null || x.getCalibre().equals(calibre))
     				              .filter(x -> varietat  == null || x.getVarietat().equals(varietat))
     				              .collect(Collectors.toList());
-    	   
-    		 
-//    		 if (qualitat != null) { 
-//    			 
-//    				 registresTotals = registresTotals.stream().filter(x -> qualitat == null ||x.getQualitat().equals(qualitat)).collect(Collectors.toList());
-//    			}
-//    		 
-//    		 if (calibre != null) {
-//    				 registresTotals = registresTotals.stream().filter(x -> calibre == null || x.getCalibre().equals(calibre)).collect(Collectors.toList()); 
-//    			}
-//    		 
-//    		 if (varietat != null) {
-//    				 registresTotals = registresTotals.stream().filter(x -> varietat == null || x.getVarietat().equals(varietat)).collect(Collectors.toList());	
-//    			}
     	 }
     	 return registresTotals;     
-//    	 return registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
     }
     
     @Transactional(readOnly = true)
@@ -208,7 +201,7 @@ public class RegisterController {
     {    	    	 
 //    	 Stream<Register> registresTotals = registreRepository.findAllStream();
     	 List<Register> registresTotals = registreRepository.findAll();
-    	 
+    
     	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, registresTotals);
     	 
     	 

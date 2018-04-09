@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.oapc.model.AtributsCombo;
 import com.oapc.model.ErrorRest;
+import com.oapc.model.InfoRegistres;
 import com.oapc.model.PDU;
 import com.oapc.repo.PduRepository;
 
@@ -169,13 +170,42 @@ public class PduController {
     }
     
     @Transactional(readOnly = true)
-    @GetMapping("/pdu/productesModal")
-    public List<String> getProductsNameForModal(){
+    @GetMapping("/pdu/PROPDU")
+    public List<InfoRegistres> getProductsName2(){
     	String vacio = "";
     	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
-    	List<String> productes = new ArrayList<String>();
+    	InfoRegistres producte = new InfoRegistres();
+    	producte.setClau("");
+    	producte.setNom("Tots");
+    	List<InfoRegistres> productes = new ArrayList<InfoRegistres>();
+    	productes.add(producte);
     	for (PDU registre : pduStream.collect(Collectors.toList())) {
-			productes.add(registre.getClave());
+//			productes.add(registre.getDatos().substring(0, 25).trim());
+//			productes.add(registre.getClave());
+    		producte = new InfoRegistres();
+    		producte.setClau(registre.getClave());
+    		producte.setNom(registre.getDatos().substring(0, 25).trim());
+    		producte.setSubGrup(registre.getDatos().substring(32, 34).trim());
+    		productes.add(producte);
+		}
+    	return productes;
+    }
+    
+    @Transactional(readOnly = true)
+    @GetMapping("/pdu/productesModal")
+    public List<InfoRegistres> getProductsNameForModal(){
+    	String vacio = "";
+    	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
+    	
+    	List<InfoRegistres> productes = new ArrayList<InfoRegistres>();
+    	for (PDU registre : pduStream.collect(Collectors.toList())) {
+//			productes.add(registre.getDatos().substring(0, 25).trim());
+//			productes.add(registre.getClave());
+    		InfoRegistres producte = new InfoRegistres();
+    		producte.setClau(registre.getClave());
+    		producte.setNom(registre.getDatos().substring(0, 25).trim());
+    		producte.setSubGrup(registre.getDatos().substring(32, 34).trim());
+    		productes.add(producte);
 		}
     	return productes;
     }
@@ -215,12 +245,19 @@ public class PduController {
     		
     		switch (atribut) {
     		case "COLORCARN":
-    			List<String> colorsCarns = new ArrayList<String>();
-    			colorsCarns.add("");
+    			List<InfoRegistres> colorsCarns = new ArrayList<InfoRegistres>();
+    			InfoRegistres colorCarn = new InfoRegistres();
+    			colorCarn.setClau("");
+				colorCarn.setNom("-");
+				colorsCarns.add(colorCarn);
     			for (String producteKey : productesKey) {
     				for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
 						if (!colorsCarns.contains(regis.getClave().substring(producteKey.length()))) {
-							colorsCarns.add(regis.getClave().substring(producteKey.length()));
+//							colorsCarns.add(regis.getClave().substring(producteKey.length()));
+							colorCarn = new InfoRegistres();
+							colorCarn.setClau(regis.getClave().substring(producteKey.length()));
+							colorCarn.setNom(regis.getDatos());
+							colorsCarns.add(colorCarn);
 						}
 					}
 				}
@@ -228,36 +265,57 @@ public class PduController {
     			atributsCombo.setColorsCarn(colorsCarns);
     			break;
     		case "VARIETAT":
-    			List<String> varietats = new ArrayList<String>();
-    			varietats.add("");
+    			List<InfoRegistres> varietats = new ArrayList<InfoRegistres>();
+    			InfoRegistres varietat = new InfoRegistres();
+    			varietat.setClau("");
+    			varietat.setNom("-");
+    			varietats.add(varietat);
     			for (String producteKey : productesKey) {
 	    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
 	    				if (!varietats.contains("VA"+regis.getClave().substring(producteKey.length()))) {
-	    					varietats.add("VA"+regis.getClave().substring(producteKey.length()));
+//	    					varietats.add("VA"+regis.getClave().substring(producteKey.length()));
+	    					varietat = new InfoRegistres();
+	        				varietat.setClau("VA"+regis.getClave().substring(producteKey.length()));
+	        				varietat.setNom(regis.getDatos());
+	        				varietats.add(varietat);
 	    				}
 					}
     			}
     				atributsCombo.setVarietats(varietats);
     			break;
     		case "QUALITAT":
-    			List<String> qualitats = new ArrayList<String>();
-    			qualitats.add("");
+    			List<InfoRegistres> qualitats = new ArrayList<InfoRegistres>();
+    			InfoRegistres qualitat = new InfoRegistres();
+    			qualitat.setClau("");
+    			qualitat.setNom("-");
+    			qualitats.add(qualitat);
     			for (String producteKey : productesKey) {
 	    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
 	    				if (!qualitats.contains("QU"+regis.getClave().substring(producteKey.length()))) {
-	    					qualitats.add("QU"+regis.getClave().substring(producteKey.length()));
+//	    					qualitats.add("QU"+regis.getClave().substring(producteKey.length()));
+	    					qualitat = new InfoRegistres();
+	        				qualitat.setClau("QU"+regis.getClave().substring(producteKey.length()));
+	        				qualitat.setNom(regis.getDatos());
+	        				qualitats.add(qualitat);
 	    				}
 					}
     			}
     				atributsCombo.setQualitats(qualitats);
     			break;
     		case "CALIBRE":
-    			List<String> calibres = new ArrayList<String>();
-    			calibres.add("");
+    			List<InfoRegistres> calibres = new ArrayList<InfoRegistres>();
+    			InfoRegistres calibre = new InfoRegistres();
+    			calibre.setClau("");
+    			calibre.setNom("-");
+    			calibres.add(calibre);
     			for (String producteKey : productesKey) {
 	    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
 	    				if (!calibres.contains("CA"+regis.getClave().substring(producteKey.length()))) {
-	    					calibres.add("CA"+regis.getClave().substring(producteKey.length()));
+//	    					calibres.add("CA"+regis.getClave().substring(producteKey.length()));
+	    					calibre = new InfoRegistres();
+	            			calibre.setClau("CA"+regis.getClave().substring(producteKey.length()));
+	            			calibre.setNom(regis.getDatos());
+	            			calibres.add(calibre);
 	    				}
 					}
     			}
@@ -269,34 +327,68 @@ public class PduController {
     }
     
     public AtributsCombo combosAmbProducte(String producteKey, AtributsCombo atributsCombo) {
+    	
     	for (String atribut : combos) {
     		
     		switch (atribut) {
     		case "COLORCARN":
-    			List<String> colorsCarns = new ArrayList<String>();
+    			List<InfoRegistres> colorsCarns = new ArrayList<InfoRegistres>();
+    			InfoRegistres colorCarn = new InfoRegistres();
+    			colorCarn.setClau("");
+				colorCarn.setNom("-");
+				colorsCarns.add(colorCarn);
     			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
     				
-					colorsCarns.add(regis.getClave().substring(producteKey.length()));
+//					colorsCarns.add(regis.getClave().substring(producteKey.length()));
+    				colorCarn = new InfoRegistres();
+					colorCarn.setClau(regis.getClave().substring(producteKey.length()));
+					colorCarn.setNom(regis.getDatos());
+					colorsCarns.add(colorCarn);
 				}
     				atributsCombo.setColorsCarn(colorsCarns);
     			break;
     		case "VARIETAT":
-    			List<String> varietats = new ArrayList<String>();
+    			List<InfoRegistres> varietats = new ArrayList<InfoRegistres>();
+    			InfoRegistres varietat = new InfoRegistres();
+    			varietat.setClau("");
+    			varietat.setNom("-");
+    			varietats.add(varietat);
     			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
-    				varietats.add("VA"+regis.getClave().substring(producteKey.length()));
+//    				varietats.add("VA"+regis.getClave().substring(producteKey.length()));
+    				varietat = new InfoRegistres();
+    				varietat.setClau("VA"+regis.getClave().substring(producteKey.length()));
+    				varietat.setNom(regis.getDatos());
+    				varietats.add(varietat);
 				}
+    				atributsCombo.setVarietats(varietats);
     			break;
     		case "QUALITAT":
-    			List<String> qualitats = new ArrayList<String>();
+    			List<InfoRegistres> qualitats = new ArrayList<InfoRegistres>();
+    			InfoRegistres qualitat = new InfoRegistres();
+    			qualitat.setClau("");
+    			qualitat.setNom("-");
+    			qualitats.add(qualitat);
     			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
-    				qualitats.add("QU"+regis.getClave().substring(producteKey.length()));
+//    				qualitats.add("QU"+regis.getClave().substring(producteKey.length()));
+    				qualitat = new InfoRegistres();
+    				qualitat.setClau("QU"+regis.getClave().substring(producteKey.length()));
+    				qualitat.setNom(regis.getDatos());
+    				qualitats.add(qualitat);
 				}
     				atributsCombo.setQualitats(qualitats);
     			break;
     		case "CALIBRE":
-    			List<String> calibres = new ArrayList<String>();
+    			List<InfoRegistres> calibres = new ArrayList<InfoRegistres>();
+    			InfoRegistres calibre = new InfoRegistres();
+    			calibre.setClau("");
+    			calibre.setNom("-");
+    			calibres.add(calibre);
     			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
-    				calibres.add("CA"+regis.getClave().substring(producteKey.length()));
+//    				calibres.add("CA"+regis.getClave().substring(producteKey.length()));
+    				calibre = new InfoRegistres();
+        			calibre.setClau("CA"+regis.getClave().substring(producteKey.length()));
+        			calibre.setNom(regis.getDatos());
+        			calibres.add(calibre);
 				}
     				atributsCombo.setCalibres(calibres);
     			break;

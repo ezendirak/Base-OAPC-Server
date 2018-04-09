@@ -11,43 +11,43 @@ import java.util.Map;
 public class AtributsCombo {
 
 //    private List<String> ColorsCarn;
-    private List<String> ColorsCarn;
+    private List<InfoRegistres> ColorsCarn;
 
-    private List<String> Qualitats;
+    private List<InfoRegistres> Qualitats;
     
-    private List<String> Calibres;
+    private List<InfoRegistres> Calibres;
     
-    private List<String> Varietats;
+    private List<InfoRegistres> Varietats;
 
-	public List<String> getColorsCarn() {
+	public List<InfoRegistres> getColorsCarn() {
 		return ColorsCarn;
 	}
 
-	public void setColorsCarn(List<String> colorsCarn) {
+	public void setColorsCarn(List<InfoRegistres> colorsCarn) {
 		ColorsCarn = colorsCarn;
 	}
 
-	public List<String> getQualitats() {
+	public List<InfoRegistres> getQualitats() {
 		return Qualitats;
 	}
 
-	public void setQualitats(List<String> qualitats) {
+	public void setQualitats(List<InfoRegistres> qualitats) {
 		Qualitats = qualitats;
 	}
 
-	public List<String> getCalibres() {
+	public List<InfoRegistres> getCalibres() {
 		return Calibres;
 	}
 
-	public void setCalibres(List<String> calibres) {
+	public void setCalibres(List<InfoRegistres> calibres) {
 		Calibres = calibres;
 	}
 
-	public List<String> getVarietats() {
+	public List<InfoRegistres> getVarietats() {
 		return Varietats;
 	}
 
-	public void setVarietats(List<String> varietats) {
+	public void setVarietats(List<InfoRegistres> varietats) {
 		Varietats = varietats;
 	}
 
