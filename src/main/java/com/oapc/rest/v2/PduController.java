@@ -396,54 +396,6 @@ public class PduController {
 		}
     	return atributsCombo;
     }
-//    @Transactional(readOnly = true)
-//    @GetMapping("/pdu/combos/{tipusProducte}")
-//    public AtributsCombo getCombos(@PathVariable(value = "tipusProducte") String tipusProducte){
-//    	
-//    	AtributsCombo atributsCombo = new AtributsCombo(); 
-//    	Stream<PDU> product = pduRepository.getProducteByDades("PRODUCTE", tipusProducte.replaceAll("\"",""));
-//    	//String producteKey = product.collect(Collectors.toList()).get(0).getClave();
-//    	List<String> atributs = new ArrayList<String>();
-//    	for (PDU atribut : product.collect(Collectors.toList())) {
-//			atributs.add(atribut.getClave());
-//		}
-//    	String producteKey = atributs.get(0);
-//    	for (String atribut : combos) {
-//    		
-//    		switch (atribut) {
-//    		case "COLORCARN":
-////    			List<String> colorsCarns = new ArrayList<String>();
-//    			Map<String, String> colorsCarns = new HashMap<String, String>();
-//    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
-//					colorsCarns.put(regis.getClave(), regis.getDatos());
-//				}
-//    				atributsCombo.setColorsCarn(colorsCarns);
-//    			break;
-//    		case "VARIETAT":
-//    			Map<String, String> varietats = new HashMap<String, String>();
-//    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
-//    				varietats.put(regis.getClave(), regis.getDatos());
-//				}
-//    				atributsCombo.setVarietats(varietats);
-//    			break;
-//    		case "QUALITAT":
-//    			Map<String, String> qualitats = new HashMap<String, String>();
-//    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
-//    				qualitats.put(regis.getClave(), regis.getDatos());
-//				}
-//    				atributsCombo.setQualitats(qualitats);
-//    			break;
-//    		case "CALIBRE":
-//    			Map<String, String> calibres = new HashMap<String, String>();
-//    			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
-//    				calibres.put(regis.getClave(), regis.getDatos());
-//				}
-//    				atributsCombo.setCalibres(calibres);
-//    			break;
-//    		}
-//		}
-//    	return atributsCombo;
-//    }
     
     @Transactional(readOnly = true)
     @GetMapping("/pduCombos")
@@ -456,6 +408,16 @@ public class PduController {
     	return combosByProduct;
     }
     
+    public boolean existeEn(String valor, String atribut) {
+    	
+    	Stream<PDU> pduStream = pduRepository.getDadesByData(atribut, valor);
+    	
+    	if (pduStream.collect(Collectors.toList()).size() > 0) {
+    		return true;
+    	}  else {
+    		return false;
+    	}
+    }
 //    @Transactional(readOnly = true)
 //    @GetMapping("/pdu/colorcarn/{tipusProducte}")
 //    public List<String> getColorCarn(@PathVariable(value = "tipusProducte") String tipusProducte){

@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import com.oapc.model.ErrorRest;
 import com.oapc.model.Register;
+import com.oapc.repo.PduRepository;
 import com.oapc.repo.RegisterRepository;
+import com.oapc.rest.v2.PduController;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,12 @@ public class RegisterController {
 	
     @Autowired
     RegisterRepository registreRepository;
+    
+    @Autowired
+    PduRepository pduRepository;
+    
+    @Autowired
+    PduController pduController;
 
 //    private String[] taules = {"FAMILIA", "PRODUCTE", "SUBFAMILIA", "GRUP", "SUBGRUP", "COLORCARN", "QUALITAT", "CALIBRE"};
     
@@ -100,12 +108,26 @@ public class RegisterController {
         }
         return ResponseEntity.ok().body(note);
     }
-
+//    private String[] combos = {"COLORCARN", "VARIETAT", "QUALITAT", "CALIBRE"};
     @PostMapping("/registres")
-    public Register createRegister(@Valid @RequestBody Register note) {
-        return registreRepository.save(note);
+    public Register createRegister(@Valid @RequestBody Register registre) {
+    	
+    	if(!pduController.existeEn("PRODUCTE", registre.getVarietat())) {
+    		//ERROR EN EL TIPUS DE PRODUCTE
+    	}else if (!pduController.existeEn("COLORCARN", registre.getColorCarn())) {
+    		//ERROR EN EL COLOR DE LA CARN
+    	}else if (!pduController.existeEn("VARIETAT", registre.getVarietat())) {
+    		//ERROR EN LA VARIETAT
+    	}else if (!pduController.existeEn("QUALITAT", registre.getQualitat())) {
+    		//ERROR EN EL QUALITAT
+    	}else if (!pduController.existeEn("CALIBRE", registre.getCalibre())) {
+    		//ERROR EN EL CALIBRE
+    	}
+        return registreRepository.save(registre);
     }
 
+    
+    
     @PutMapping("/registres")
     public ResponseEntity<Register> updateRegister(@Valid @RequestBody Register registerDetails) {
     	
