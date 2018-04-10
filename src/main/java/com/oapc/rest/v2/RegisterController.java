@@ -112,16 +112,53 @@ public class RegisterController {
     @PostMapping("/registres")
     public Register createRegister(@Valid @RequestBody Register registre) {
     	
-    	if(!pduController.existeEn("PRODUCTE", registre.getVarietat())) {
+    	if(!pduController.existeEn("PRODUCTE", registre.getTipusProducte())) {
     		//ERROR EN EL TIPUS DE PRODUCTE
+    		logger.info("ERROR. El producte "+ registre.getTipusProducte() + " no està donat d'alta.");
+    		
     	}else if (!pduController.existeEn("COLORCARN", registre.getColorCarn())) {
     		//ERROR EN EL COLOR DE LA CARN
+    		logger.info("ERROR. El color de carn "+ registre.getColorCarn() + " no està donat d'alta.");
+    		
     	}else if (!pduController.existeEn("VARIETAT", registre.getVarietat())) {
     		//ERROR EN LA VARIETAT
+    		logger.info("ERROR. La varietat "+ registre.getVarietat() + " no està donat d'alta.");
+    		
     	}else if (!pduController.existeEn("QUALITAT", registre.getQualitat())) {
     		//ERROR EN EL QUALITAT
+    		logger.info("ERROR. La qualitat "+ registre.getQualitat() + " no està donada d'alta.");
+    		
     	}else if (!pduController.existeEn("CALIBRE", registre.getCalibre())) {
     		//ERROR EN EL CALIBRE
+    		logger.info("ERROR. El calibre "+ registre.getCalibre() + " no està donat d'alta.");
+    		
+    	}
+        return registreRepository.save(registre);
+    }
+    
+    @PostMapping("/fromExcelRegistres")
+    public Register createRegisterFromExcel(@Valid @RequestBody Register registre, @RequestParam(value = "Familia", required=false) String familia) {
+    	
+    	if(!pduController.existeEn("PRODUCTE", registre.getTipusProducte())) {
+    		//ERROR EN EL TIPUS DE PRODUCTE
+    		logger.info("ERROR. El producte "+ registre.getTipusProducte() + " no està donat d'alta.");
+    		
+    	}else if (!pduController.existeEn("COLORCARN", registre.getColorCarn()) && familia == "1") {
+    		//ERROR EN EL COLOR DE LA CARN
+    		logger.info("ERROR. El color de carn "+ registre.getColorCarn() + " no està donat d'alta.");
+    		
+    	}else if (!pduController.existeEn("VARIETAT", registre.getVarietat()) && familia == "2") {
+    		//ERROR EN LA VARIETAT
+    		logger.info("ERROR. La varietat "+ registre.getVarietat() + " no està donat d'alta.");
+    		
+    	}else if (!pduController.existeEn("QUALITAT", registre.getQualitat())) {
+    		//ERROR EN EL QUALITAT
+    		logger.info("ERROR. La qualitat "+ registre.getQualitat() + " no està donada d'alta.");
+    		
+    	}else if (!pduController.existeEn("CALIBRE", registre.getCalibre())) {
+    		//ERROR EN EL CALIBRE
+    		logger.info("ERROR. El calibre "+ registre.getCalibre() + " no està donat d'alta.");
+    		
     	}
         return registreRepository.save(registre);
     }

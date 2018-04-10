@@ -170,6 +170,19 @@ public class PduController {
     }
     
     @Transactional(readOnly = true)
+    
+    public List<String> getProductsTrueNames(){
+    	String vacio = "";
+    	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
+    	List<String> productes = new ArrayList<String>();
+    	for (PDU registre : pduStream.collect(Collectors.toList())) {
+			productes.add(registre.getDatos().substring(0, 25).trim());
+//			productes.add(registre.getClave());
+		}
+    	return productes;
+    }
+    
+    @Transactional(readOnly = true)
     @GetMapping("/pdu/PROPDU")
     public List<InfoRegistres> getProductsName2(){
     	String vacio = "";
@@ -222,6 +235,32 @@ public class PduController {
 			atributs.add(atribut.getClave());
 		}
     	
+    	if (atributs.size() > 1) {
+    		List<String> producteKey = new ArrayList<String>();
+    		for (String producte : atributs) {
+				producteKey.add(producte);
+			}
+    		atributsCombo = combosSenseProducte(producteKey, atributsCombo);
+    	}else {
+    		String producteKey= atributs.get(0);
+    		atributsCombo = combosAmbProducte(producteKey, atributsCombo);
+    	}
+    	
+    	
+    	return atributsCombo;
+    }
+    
+    @Transactional(readOnly = true)
+    public AtributsCombo getCombosName(String tipusProducte){
+    	
+    	AtributsCombo atributsCombo = new AtributsCombo(); 
+    	Stream<PDU> product = pduRepository.getDadesByData("PRODUCTE", tipusProducte);
+    	//String producteKey = product.collect(Collectors.toList()).get(0).getClave();
+    	List<String> atributs = new ArrayList<String>();
+    	for (PDU atribut : product.collect(Collectors.toList())) {
+			atributs.add(atribut.getClave());
+		}
+    	
     	
     	
     	if (atributs.size() > 1) {
@@ -232,7 +271,7 @@ public class PduController {
     		atributsCombo = combosSenseProducte(producteKey, atributsCombo);
     	}else {
     		String producteKey= atributs.get(0);
-    		atributsCombo = combosAmbProducte(producteKey, atributsCombo);
+    		atributsCombo = combosAmbProducteModalToAdd(producteKey, atributsCombo);
     	}
     	
     	
@@ -408,6 +447,17 @@ public class PduController {
     	return combosByProduct;
     }
     
+    @Transactional(readOnly = true)
+    @GetMapping("/pduNamedCombos")
+    public Map<String, AtributsCombo> getAllCombosNamesProducts() {
+    	List<String> ProductsNames = getProductsTrueNames();
+    	Map<String, AtributsCombo> combosByProduct = new HashMap<String, AtributsCombo>();
+    	for (String product : ProductsNames) {
+			combosByProduct.put(product, getCombosName(product));
+		}
+    	return combosByProduct;
+    }
+    
     ////////////////////////////////////////////////////////MODAL////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -571,13 +621,72 @@ public AtributsCombo combosAmbProducteModalToAdd(String producteKey, AtributsCom
 		}
     	return atributsCombo;
     }
+
+public AtributsCombo combosAmbNomsProducte(String producteKey, AtributsCombo atributsCombo) {
+	
+	for (String atribut : combos) {
+		
+		switch (atribut) {
+		case "COLORCARN":
+			List<InfoRegistres> colorsCarns = new ArrayList<InfoRegistres>();
+			
+			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+				
+//				colorsCarns.add(regis.getClave().substring(producteKey.length()));
+				InfoRegistres colorCarn = new InfoRegistres();
+				colorCarn.setClau(regis.getClave().substring(producteKey.length()));
+				colorCarn.setNom(regis.getDatos());
+				colorsCarns.add(colorCarn);
+			}
+				atributsCombo.setColorsCarn(colorsCarns);
+			break;
+		case "VARIETAT":
+			List<InfoRegistres> varietats = new ArrayList<InfoRegistres>();
+			
+			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+//				varietats.add("VA"+regis.getClave().substring(producteKey.length()));
+				InfoRegistres varietat = new InfoRegistres();
+				varietat.setClau("VA"+regis.getClave().substring(producteKey.length()));
+				varietat.setNom(regis.getDatos());
+				varietats.add(varietat);
+			}
+				atributsCombo.setVarietats(varietats);
+			break;
+		case "QUALITAT":
+			List<InfoRegistres> qualitats = new ArrayList<InfoRegistres>();
+			
+			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+//				qualitats.add("QU"+regis.getClave().substring(producteKey.length()));
+				InfoRegistres qualitat = new InfoRegistres();
+				qualitat.setClau("QU"+regis.getClave().substring(producteKey.length()));
+				qualitat.setNom(regis.getDatos());
+				qualitats.add(qualitat);
+			}
+				atributsCombo.setQualitats(qualitats);
+			break;
+		case "CALIBRE":
+			List<InfoRegistres> calibres = new ArrayList<InfoRegistres>();
+			
+			for (PDU regis : pduRepository.getDades(atribut, producteKey).collect(Collectors.toList())) {
+//				calibres.add("CA"+regis.getClave().substring(producteKey.length()));
+				InfoRegistres calibre = new InfoRegistres();
+    			calibre.setClau("CA"+regis.getClave().substring(producteKey.length()));
+    			calibre.setNom(regis.getDatos());
+    			calibres.add(calibre);
+			}
+				atributsCombo.setCalibres(calibres);
+			break;
+		}
+	}
+	return atributsCombo;
+}
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Transactional(readOnly = true)
     public boolean existeEn(String valor, String atribut) {
     	
-    	Stream<PDU> pduStream = pduRepository.getDadesByData(atribut, valor);
+    	Stream<PDU> pduStream = pduRepository.getProducteByDades(valor, atribut);
     	
     	if (pduStream.collect(Collectors.toList()).size() > 0) {
     		return true;
