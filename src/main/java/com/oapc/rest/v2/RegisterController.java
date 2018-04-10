@@ -269,6 +269,7 @@ public class RegisterController {
     	 return registresTotals.stream().count();
     }
     
+    
     public List<Register> filtrarAtributs(String tipusProducte, String colorCarn, String qualitat, String calibre, String varietat, List<Register> registresTotals){
     	
     	registresTotals = registresTotals.stream()
