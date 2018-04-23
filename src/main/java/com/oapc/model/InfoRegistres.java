@@ -1,13 +1,5 @@
 package com.oapc.model;
 
-import javax.persistence.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-//@Entity
-//@Table(name = "atributsCombo")
 public class InfoRegistres {
 
 //    private List<String> ColorsCarn;
@@ -16,6 +8,8 @@ public class InfoRegistres {
     private String Nom;
     
     private String SubGrup;
+    
+    private Long Id;
 
 	public String getClau() {
 		return Clau;
@@ -39,6 +33,14 @@ public class InfoRegistres {
 
 	public void setSubGrup(String subGrup) {
 		SubGrup = subGrup;
+	}
+
+	public Long getId() {
+		return Id;
+	}
+
+	public void setId(Long id) {
+		Id = id;
 	}
 
     

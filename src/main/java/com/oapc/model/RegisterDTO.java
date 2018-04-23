@@ -7,26 +7,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-@Entity
-@Table(name = "register")
 
-public class Register {
+
+public class RegisterDTO {
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
 //	@Column(name="TABLA", length=10)
-//    private String  periode;
-	
-	@ManyToOne
-	@JoinColumn(name="idPeriode", nullable = false)
-//	@JsonManagedReference
-//	@JsonBackReference
-	@JsonIgnoreProperties("registers")
-//	@JoinTable(name="register_periode")
-//	@JsonManagedReference
-	private Periode periode;
+    private String  periode;
+
 	
 //	@Column(name="CLAVE", length=30)
     private String  tipusProducte;
@@ -49,13 +39,11 @@ public class Register {
 //  @Column(name="CONT")
     private Float preuSortida;
     
-    
-    @JsonBackReference
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="empresaInformant", nullable = false)
     private Empressa empressa;
     
-    public Register() {}
+    public RegisterDTO() {}
     
     public Long getId() {
 		return id;
@@ -67,11 +55,11 @@ public class Register {
 	
 //	@JsonIgnore
 	
-	public Periode getPeriode() {
+	public String getPeriode() {
 		return periode;
 	}
 
-	public void setPeriode(Periode periode) {
+	public void setPeriode(String periode) {
 		this.periode = periode;
 	}
 

@@ -2,15 +2,9 @@ package com.oapc.model;
 
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 @Entity
-@Table(name = "register")
-
-public class Register {
+@Table(name = "errorRegister")
+public class ErrorRegister {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -18,14 +12,8 @@ public class Register {
 
 //	@Column(name="TABLA", length=10)
 //    private String  periode;
-	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="idPeriode", nullable = false)
-//	@JsonManagedReference
-//	@JsonBackReference
-	@JsonIgnoreProperties("registers")
-//	@JoinTable(name="register_periode")
-//	@JsonManagedReference
 	private Periode periode;
 	
 //	@Column(name="CLAVE", length=30)
@@ -49,13 +37,12 @@ public class Register {
 //  @Column(name="CONT")
     private Float preuSortida;
     
-    
-    @JsonBackReference
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="empresaInformant", nullable = false)
     private Empressa empressa;
     
-    public Register() {}
+    private String observacions;
+    
     
     public Long getId() {
 		return id;
@@ -64,8 +51,6 @@ public class Register {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
-//	@JsonIgnore
 	
 	public Periode getPeriode() {
 		return periode;
@@ -123,14 +108,6 @@ public class Register {
 		this.quantitatVenuda = quantitatVenuda;
 	}
 
-	public Empressa getEmpressa() {
-		return empressa;
-	}
-
-	public void setEmpressa(Empressa empressa) {
-		this.empressa = empressa;
-	}
-	
 	public Float getPreuSortida() {
 		return preuSortida;
 	}
@@ -139,7 +116,21 @@ public class Register {
 		this.preuSortida = preuSortida;
 	}
 
+	public Empressa getEmpressa() {
+		return empressa;
+	}
 
+	public void setEmpressa(Empressa empressa) {
+		this.empressa = empressa;
+	}
+	
+	public String getObservacions() {
+		return observacions;
+	}
+
+	public void setObservacions(String observacions) {
+		this.observacions = observacions;
+	}
 
         
 }

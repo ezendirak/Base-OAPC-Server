@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import java.sql.Timestamp;
@@ -64,6 +65,19 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
     private List<Authority> authorities;
 
+    @JsonIgnore
+    @OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "rol_id", nullable = false)
+	private Rols rol;
+    
+    public Rols getRol() {
+    	return rol;
+    }
+    
+    public void setRol(Rols rol) {
+    	this.rol = rol;
+    }
+    
     public Long getId() {
         return id;
     }
