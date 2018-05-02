@@ -23,9 +23,7 @@ public interface PduRepository extends JpaRepository<PDU, Long> {
 	@Query("select p from PDU p where p.tabla = :taula and p.datos like %:producte%")
 	Stream<PDU> getProducteByDades(@Param("taula") String taula, @Param("producte") String producte);
 	
-	@Query("select p from PDU p where p.tabla = :taula and p.datos like %:dade%")
-	Stream<PDU> getDadesByData(@Param("taula") String taula, @Param("dade") String dade);
+	@Query("select p from PDU p where p.clave like %:clave% and p.datos = :valor")
+	Stream<PDU> getIfOldProduct(@Param("clave") String clave, @Param("valor") String valor);
 	
-//	@Query("select p from PDU p where p.tabla = :atribut and p.clave like %:clau%")
-//	List<PDU> getAtributsProd(@Param("clau") String clau, @Param("atribut") String atribut);
 }

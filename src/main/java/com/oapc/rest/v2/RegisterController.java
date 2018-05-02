@@ -152,7 +152,7 @@ public class RegisterController {
     }
     
     @PostMapping("/fromExcelRegistres")
-    public Register createRegisterFromExcel(@Valid @RequestBody Register registre, @RequestParam(value = "Familia", required=false) String familia) {
+    public Register createRegisterFromExcel(@Valid @RequestBody RegisterDTO registre, @RequestParam(value = "Familia", required=false) String familia) {
     	
     	if(!pduController.existeEn("PRODUCTE", registre.getTipusProducte())) {
     		//ERROR EN EL TIPUS DE PRODUCTE
@@ -176,11 +176,38 @@ public class RegisterController {
     		//ERROR EN EL CALIBRE
     		logger.info("ERROR. El calibre "+ registre.getCalibre() + " no està donat d'alta.");
     		
+    	}else {
+    		Periode peri = periodeRepository.findOne(Long.valueOf(registre.getPeriode()));
+        	Empressa emp = empressaRepository.findOne(2L);
+//        	Empressa emp2 = empressaRepository.findById(1L);
+//        	long prova = registre.getPeriode();
+//        	logger.info(String.valueOf(prova));
+        	Register regi = new Register();
+        	regi.setCalibre(registre.getCalibre());
+        	regi.setColorCarn(registre.getColorCarn());
+        	regi.setPreuSortida(registre.getPreuSortida());
+        	regi.setVarietat(registre.getVarietat());
+        	regi.setQualitat(registre.getQualitat());
+        	regi.setQuantitatVenuda(registre.getQuantitatVenuda());
+        	regi.setTipusProducte(registre.getTipusProducte());
+        	regi.setPeriode(peri);
+        	regi.setEmpressa(emp);
+        	return registreRepository.save(regi);
     	}
-        return registreRepository.save(registre);
+    	//QUE FEM EN AQUEST CAS
+        return null;
     }
-
     
+//    3
+    @PostMapping("/downloadToExcel")
+    public void crearExcelFromDataTable(@RequestBody List<RegisterDTO> frmData)
+    {
+    	if (frmData != null) {
+    		logger.info("NO ES NULL");
+    	}else {
+    		logger.info("ES FAKIN NULL");
+    	}
+    }
     
     @PutMapping("/registres")
     public ResponseEntity<Register> updateRegister(@Valid @RequestBody Register registerDetails) {
@@ -292,12 +319,15 @@ public class RegisterController {
     @Transactional(readOnly = true)
     @GetMapping("/registresFiltrat")
     public ResponseEntity<?> getRegistresFiltratsPaginats(@RequestParam(value="page",     defaultValue="0") String spage,
-    		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat, @RequestParam(value="periode", required=false) String periode)	    		    		    	
+    		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, 
+    		@RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat, 
+    		@RequestParam(value="periode", required=false) String periode, @RequestParam(value="qVenuda", required=false) String qVenuda, @RequestParam(value="qVenuda2", required=false) String qVenuda2,
+    		@RequestParam(value="pSortida", required=false) String pSortida, @RequestParam(value="pSortida2", required=false) String pSortida2)	    		    		    	
     {    	    	 
 //    	 Stream<Register> registresTotals = registreRepository.findAllStream();
     	 List<Register> registresTotals = registreRepository.findAll();
     	 List<RegisterDTO> regis = new ArrayList<RegisterDTO>();
-    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals);
+    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals, qVenuda, qVenuda2, pSortida, pSortida2);
     	 
     	 
     	 Integer page      = Integer.parseInt(spage);
@@ -346,18 +376,21 @@ public class RegisterController {
     
     @Transactional(readOnly = true)
     @GetMapping("/registres_countFiltrat")
-    public Long getRegisterCountFiltrat(@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat, @RequestParam(value="periode", required=false) String periode)	    		    		    	
+    public Long getRegisterCountFiltrat(@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, 
+    		@RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat, 
+    		@RequestParam(value="periode", required=false) String periode, @RequestParam(value="qVenuda", required=false) String qVenuda, @RequestParam(value="qVenuda2", required=false) String qVenuda2, 
+    		@RequestParam(value="pSortida", required=false) String pSortida, @RequestParam(value="pSortida2", required=false) String pSortida2)	    		    		    	
     {    
     	
     	 List<Register> registresTotals = registreRepository.findAll();
     	 
-    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals);
+    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals, qVenuda, qVenuda2, pSortida, pSortida2);
     	
     	 return registresTotals.stream().count();
     }
     
     
-    public List<Register> filtrarAtributs(String tipusProducte, String colorCarn, String qualitat, String calibre, String varietat, String periode, List<Register> registresTotals){
+    public List<Register> filtrarAtributs(String tipusProducte, String colorCarn, String qualitat, String calibre, String varietat, String periode, List<Register> registresTotals, String qVenuda, String qVenuda2, String pSortida, String pSortida2){
     	
     	
     	registresTotals = registresTotals.stream()
@@ -366,6 +399,10 @@ public class RegisterController {
 	              .filter(x -> qualitat  == null     || x.getQualitat().equals(qualitat))
 	              .filter(x -> calibre   == null     || x.getCalibre().equals(calibre))
 	              .filter(x -> varietat  == null     || x.getVarietat().equals(varietat))
+	              .filter(x -> qVenuda == null		 || x.getQuantitatVenuda() > Long.valueOf(qVenuda))
+	              .filter(x -> qVenuda2 == null		 || x.getQuantitatVenuda() < Long.valueOf(qVenuda2))
+	              .filter(x -> pSortida == null		 || x.getQuantitatVenuda() > Long.valueOf(pSortida))
+	              .filter(x -> pSortida2 == null		 || x.getQuantitatVenuda() < Long.valueOf(pSortida2))
 	              .collect(Collectors.toList());
     	
     	if (periode != null) {
@@ -385,15 +422,6 @@ public class RegisterController {
     @GetMapping("/periodesTotals")
     public List<PeriodeDTO> getPeriodesTotals() throws ParseException{
     	
-//    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-//    	DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//    	Date dataActual = new Date();
-    	
-//    	String dateConverting = formatter.format(dataActual);
-//    	Date formatedDate = Date.from(Instant.parse(dateConverting));2018-05-07
-//    	LocalDate localDate = LocalDate.parse(dateConverting, formatter2);
-//    	LocalDate localDate2 = LocalDate.parse("2018-05-08", formatter2);
-//    	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponibles(java.sql.Date.valueOf(localDate));
     	List<Periode> streamPeriode = periodeRepository.findAllList();
     	List<PeriodeDTO> periodesList = new ArrayList<PeriodeDTO>();
     	
@@ -432,6 +460,44 @@ public class RegisterController {
     	LocalDate localDate = LocalDate.parse(dateConverting, formatter2);
 //    	LocalDate localDate2 = LocalDate.parse("2018-05-08", formatter2);
     	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponibles(java.sql.Date.valueOf(localDate));
+    	List<PeriodeDTO> periodesList = new ArrayList<PeriodeDTO>();
+    	
+    	for (Periode peri : streamPeriode.collect(Collectors.toList())) {
+			PeriodeDTO temp = new PeriodeDTO();
+			temp.setAny(peri.getAny());
+			temp.setData_inici(peri.getDataInici());
+			temp.setDataFi(peri.getDataFi());
+			temp.setDuracio(peri.getDuracio());
+			temp.setId(peri.getId());
+			temp.setNumPeriode(peri.getNumPeriode());
+			temp.setTipusPeriode(peri.getTipusPeriode());
+			periodesList.add(temp);
+		}
+//    	return streamPeriode.collect(Collectors.toList());
+    	return periodesList;
+    }
+    
+    
+    //PERIODES PEL FILTRE DE REGISTRE
+    @Transactional(readOnly = true)
+    @GetMapping("/periodesByProd/{subGrup}")
+    public List<PeriodeDTO> getPeriodesByProd(@PathVariable(value = "subGrup", required=false) String subGrup){
+    	
+    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    	DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    	Date dataActual = new Date();
+    	
+    	String dateConverting = formatter.format(dataActual);
+//    	Date formatedDate = Date.from(Instant.parse(dateConverting));2018-05-07
+    	LocalDate localDate = LocalDate.parse(dateConverting, formatter2);
+//    	LocalDate localDate2 = LocalDate.parse("2018-05-08", formatter2);
+    	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponibles(java.sql.Date.valueOf(localDate));
+    	if (subGrup.equals("PI")) {
+    		streamPeriode = streamPeriode.filter(x -> x.getTipusPeriode().equals("S"));
+    	}else if (subGrup.equals("LL")) {
+    		streamPeriode = streamPeriode.filter(x -> x.getTipusPeriode().equals("Q"));
+    	}
+    	
     	List<PeriodeDTO> periodesList = new ArrayList<PeriodeDTO>();
     	
     	for (Periode peri : streamPeriode.collect(Collectors.toList())) {

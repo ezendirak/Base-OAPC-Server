@@ -40,9 +40,15 @@ public class EmpressaProducte {
 		this.tipusProducte = tipusProducte;
 	}
 	
+	public Empressa getEmpressa() {
+		return empressa;
+	}
+	
+	public void setEmpressa(Empressa empressa) {
+		this.empressa = empressa;
+	}
 	
 	
-
 	
 }
         

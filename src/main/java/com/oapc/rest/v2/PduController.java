@@ -4,9 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.oapc.model.AtributsCombo;
+import com.oapc.model.Empressa;
 import com.oapc.model.ErrorRest;
 import com.oapc.model.InfoRegistres;
+import com.oapc.model.NewProdDTO;
 import com.oapc.model.PDU;
+import com.oapc.model.Periode;
+import com.oapc.model.Register;
+import com.oapc.model.RegisterDTO;
 import com.oapc.repo.PduRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,10 +60,9 @@ public class PduController {
 		}
     	logger.info("PDU: " + datos);
     	//DATOS/TEMP ara nomes tenim la key(clave)
-//    	Stream<PDU> pduStream = pduRepository.findAllStream();
+    	
     	Stream<PDU> pduStream = pduRepository.getDades(getTaulaTrobada(), getKeyTrobada());
-//    	pduStream = pduStream.filter(x -> x.getTabla().equals(getTaulaTrobada())).filter(x -> x.getClave().contains(getKeyTrobada()));
-        return pduStream.collect(Collectors.toList());                     
+    	return pduStream.collect(Collectors.toList());                     
     }
     
 //    public List<PDU> getAllValues(@PathVariable(value = "clau") String clau, @PathVariable(value = "atribut") String atribut) {
@@ -143,22 +147,7 @@ public class PduController {
     	return pduRepository.findAll();        
     }
 
-//    @GetMapping("/fromFiltro/{color}")
-//    public ResponseEntity<Note> getNoteById(@PathVariable(value = "color") String color) {
-//    	
-//        Note note = colorRepository.findOne(color);
-//        if(note == null) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        return ResponseEntity.ok().body(note);
-//    }
 
-//    @Transactional(readOnly = true)
-//    @GetMapping("/pdu/{datos}")
-//    public List<PDU> getNameProducts {
-//    	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", null);
-//    	return pduStream.collect(Collectors.toList());                     
-//    }
     //Dona la clau, no el name
     @Transactional(readOnly = true)
     @GetMapping("/pdu/productes")
@@ -168,7 +157,7 @@ public class PduController {
     	List<String> productes = new ArrayList<String>();
     	productes.add("");
     	for (PDU registre : pduStream.collect(Collectors.toList())) {
-//			productes.add(registre.getDatos().substring(0, 25).trim());
+    		
 			productes.add(registre.getClave());
 		}
     	return productes;
@@ -182,7 +171,7 @@ public class PduController {
     	List<String> productes = new ArrayList<String>();
     	for (PDU registre : pduStream.collect(Collectors.toList())) {
 			productes.add(registre.getDatos().substring(0, 25).trim());
-//			productes.add(registre.getClave());
+			
 		}
     	return productes;
     }
@@ -198,8 +187,7 @@ public class PduController {
     	List<InfoRegistres> productes = new ArrayList<InfoRegistres>();
     	productes.add(producte);
     	for (PDU registre : pduStream.collect(Collectors.toList())) {
-//			productes.add(registre.getDatos().substring(0, 25).trim());
-//			productes.add(registre.getClave());
+    		
     		producte = new InfoRegistres();
     		producte.setClau(registre.getClave());
     		producte.setNom(registre.getDatos().substring(0, 25).trim());
@@ -220,8 +208,7 @@ public class PduController {
     	List<InfoRegistres> productes = new ArrayList<InfoRegistres>();
     	productes.add(producte);
     	for (PDU registre : pduStream.collect(Collectors.toList())) {
-//			productes.add(registre.getDatos().substring(0, 25).trim());
-//			productes.add(registre.getClave());
+    		
     		producte = new InfoRegistres();
     		producte.setClau(String.valueOf(registre.getId()));
     		producte.setNom(registre.getDatos());
@@ -246,6 +233,7 @@ public class PduController {
     		producte.setClau(registre.getClave());
     		producte.setNom(registre.getDatos().substring(0, 25).trim());
     		producte.setSubGrup(registre.getDatos().substring(32, 34).trim());
+    		producte.setId(registre.getId());
     		productes.add(producte);
 		}
     	return productes;
@@ -274,7 +262,6 @@ public class PduController {
     		atributsCombo = combosAmbProducte(producteKey, atributsCombo);
     	}
     	
-    	
     	return atributsCombo;
     }
     
@@ -282,14 +269,12 @@ public class PduController {
     public AtributsCombo getCombosName(String tipusProducte){
     	
     	AtributsCombo atributsCombo = new AtributsCombo(); 
-    	Stream<PDU> product = pduRepository.getDadesByData("PRODUCTE", tipusProducte);
+    	Stream<PDU> product = pduRepository.getProducteByDades("PRODUCTE", tipusProducte);
     	//String producteKey = product.collect(Collectors.toList()).get(0).getClave();
     	List<String> atributs = new ArrayList<String>();
     	for (PDU atribut : product.collect(Collectors.toList())) {
 			atributs.add(atribut.getClave());
 		}
-    	
-    	
     	
     	if (atributs.size() > 1) {
     		List<String> producteKey = new ArrayList<String>();
@@ -301,7 +286,6 @@ public class PduController {
     		String producteKey= atributs.get(0);
     		atributsCombo = combosAmbProducteModalToAdd(producteKey, atributsCombo);
     	}
-    	
     	
     	return atributsCombo;
     }
@@ -650,6 +634,34 @@ public AtributsCombo combosAmbProducteModalToAdd(String producteKey, AtributsCom
 
 
 
+	@Transactional(readOnly = false)
+	@PostMapping("/newAtribut")
+	public PDU newAtribut(@Valid @RequestBody NewProdDTO atributByProd) {
+	
+		PDU atribut = pduRepository.findOne(atributByProd.getIdProd());
+		PDU newAtribut = new PDU();
+		if (atribut != null) {
+			
+			if (pduRepository.getIfOldProduct(atribut.getClave(), atributByProd.getValor()).count() == 0) {
+				String keyProd = atribut.getClave();
+				
+				newAtribut.setCont(1);
+				newAtribut.setDatos(atributByProd.getValor());
+				newAtribut.setTabla(atributByProd.getTaula());
+				if (atributByProd.getTaula().equals("COLORCARN")) {
+					newAtribut.setClave(keyProd+atributByProd.getValor().toUpperCase().charAt(0)+(atributByProd.getValor().toUpperCase().charAt(2)));
+				}else {
+					newAtribut.setClave(keyProd+(pduRepository.getDades(atributByProd.getTaula(), keyProd).count()+1));
+				}
+			}else {
+				//El Producte ja conté un atribut amb aquest valor
+				logger.info("El Producte ja conté un atribut amb aquest valor");
+				
+			}
+		}
+	    return pduRepository.save(newAtribut);
+	}
+	
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////

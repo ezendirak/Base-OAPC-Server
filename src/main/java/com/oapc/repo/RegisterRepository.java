@@ -18,7 +18,4 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 	@Query("select p from Register p order by id")
 	Stream<Register> findAllStream();
 	
-//	@Query("select p from PDU p where p.tabla = :taula and p.clave like %:key%")
-//	Stream<PDU> getDades(@Param("taula") String taula, @Param("key") String key);
-	
 }

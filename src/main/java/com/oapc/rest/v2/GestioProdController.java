@@ -138,26 +138,65 @@ public class GestioProdController {
     		if (registerDetails.getProducte().length() < 26) {
     			String temporal = registre.getDatos().substring(26, 34);
     			String newProduct = registerDetails.getProducte();
+    			String newProduct2 = newProduct;
     			while(newProduct.length() < 26) {
     				newProduct = newProduct + " ";
     			}
     			newProduct = newProduct + temporal;
+    			actualitzarRegistres(registre.getDatos().substring(0, 25).trim(), newProduct2, 1);
     			registre.setDatos(newProduct);
     			//Guarda
     			updatedRegistre = pduRepository.save(registre);
+//    			pduController.getProductsName2();
     		}else {
     			logger.info("Nou Producte major a 25 caracters (maxim)");
     		}
     	}
     	PDU registre2 = pduRepository.findOne(registerDetails.getIdRegistre());
     	if ((registerDetails.getValor() != null) && registre2.getDatos() != registerDetails.getValor()) {
-    		//HEM MODIFICAT EL VALOR
+    		//HEM MODIFICAT EL VALOR D'UN ATRIBUT
     		registre2.setDatos(registerDetails.getValor());
+    		actualitzarRegistres(registre2.getDatos(), registerDetails.getValor(), 2);
     		updatedRegistre = pduRepository.save(registre2);
     	}
         
 //        Register updatedRegistre = registreRepository.save(registre);
         return ResponseEntity.ok(updatedRegistre);
+    }
+    
+    
+    public void actualitzarRegistres(String valorAntic, String valorNou, Integer taula) {
+    	//Si no tenim cap registre amb aquest nom de producte, es un nom nou
+    	List<Register> registres = registreRepository.findAll();
+    	
+    	for (Register register : registres) {
+    		
+    		if (taula == 1) {
+    			
+    			if (register.getTipusProducte().equals(valorAntic)) {
+    				register.setTipusProducte(valorNou);
+    				registreRepository.save(register);
+    			}
+    		}else if (taula == 2) {
+    			
+    			if (register.getCalibre().equals(valorAntic)) {
+    				register.setCalibre(valorNou);
+    				registreRepository.save(register);
+    				
+    			}else if (register.getColorCarn().equals(valorAntic)) {
+    				register.setColorCarn(valorNou);
+    				registreRepository.save(register);
+    				
+    			}else if (register.getQualitat().equals(valorAntic)) {
+    				register.setQualitat(valorNou);
+    				registreRepository.save(register);
+    			
+    			}else if (register.getVarietat().equals(valorAntic)) {
+    				register.setVarietat(valorNou);
+    				registreRepository.save(register);
+    			}
+    		}
+		}
     }
     
     /////////////////////////////////////////////////////////////////////////////////////////////////////

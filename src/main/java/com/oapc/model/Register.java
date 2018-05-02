@@ -21,11 +21,7 @@ public class Register {
 	
 	@ManyToOne
 	@JoinColumn(name="idPeriode", nullable = false)
-//	@JsonManagedReference
-//	@JsonBackReference
 	@JsonIgnoreProperties("registers")
-//	@JoinTable(name="register_periode")
-//	@JsonManagedReference
 	private Periode periode;
 	
 //	@Column(name="CLAVE", length=30)

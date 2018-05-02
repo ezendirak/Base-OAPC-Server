@@ -20,7 +20,7 @@ public class Empressa {
 	private Integer estat;
 
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "empressa")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "empressa")
 	private Set<EmpressaProducte> empressaProducte = new HashSet();
 	
 //	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "periode")
