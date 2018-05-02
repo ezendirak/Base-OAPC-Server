@@ -24,5 +24,5 @@ public interface EmpressaProducteRepository extends JpaRepository<EmpressaProduc
 	List<EmpressaProducte> findAllStreamByEmpressa(@Param("empressaID") Empressa empressaID);
 	
 	@Query("select p from EmpressaProducte p where p.tipusProducte = :producte and p.empressa = :empressaID")
-	EmpressaProducte findAllListByProdAndEmpId(@Param("producte") String producte, @Param("empressaID") Long empressaID);
+	EmpressaProducte findAllListByProdAndEmpId(@Param("producte") String producte, @Param("empressaID") Empressa empressaID);
 }

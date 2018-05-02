@@ -25,6 +25,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -200,10 +204,37 @@ public class RegisterController {
     
 //    3
     @PostMapping("/downloadToExcel")
-    public void crearExcelFromDataTable(@RequestBody List<RegisterDTO> frmData)
+    public void crearExcelFromDataTable(@RequestBody List<RegisterDTO> frmData) throws IOException
     {
     	if (frmData != null) {
     		logger.info("NO ES NULL");
+    		
+    		String ruta = "C:/Users/pgarenas/Desktop/provaExcel.xls";
+            File archivo = new File(ruta);
+            BufferedWriter bw;
+            if(archivo.exists()) {
+                bw = new BufferedWriter(new FileWriter(archivo));
+                bw.write("El fichero de texto ya estaba creado.");
+            } else {
+            	
+            	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            	DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            	Date dataActual = new Date();
+            	
+            	String dateConverting = formatter.format(dataActual);
+            	LocalDate localDate = LocalDate.parse(dateConverting, formatter2);
+            	
+                bw = new BufferedWriter(new FileWriter(archivo));
+                bw.write("Id\tPeriode\tTipus de producte\tVarietat\tColor de carn\tCalibre\tQualitat\tQuantitat Venuda (Kg)\tPreu de Sortida\tQuantitat per preu");
+                bw.write("\n");
+                for (RegisterDTO registerDTO : frmData) {
+					bw.write(registerDTO.getId() + "\t" + registerDTO.getPeriode() + "\t" + registerDTO.getTipusProducte() + "\t" + registerDTO.getVarietat() + "\t" + registerDTO.getColorCarn() + "\t" + registerDTO.getCalibre() + "\t" + registerDTO.getQualitat() + "\t" + registerDTO.getQuantitatVenuda() + "\t" + registerDTO.getPreuSortida() + "\t" + (registerDTO.getQuantitatVenuda() * registerDTO.getPreuSortida()));
+					bw.write("\n");
+                }
+                bw.write("\n");
+                bw.write("Data de les dades: \t" + String.valueOf(java.sql.Date.valueOf(localDate)));
+            }
+            bw.close();
     	}else {
     		logger.info("ES FAKIN NULL");
     	}

@@ -2,6 +2,8 @@ package com.oapc.model;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "errorRegister")
 public class ErrorRegister {
@@ -37,7 +39,8 @@ public class ErrorRegister {
 //  @Column(name="CONT")
     private Float preuSortida;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ManyToOne
 	@JoinColumn(name="empresaInformant", nullable = false)
     private Empressa empressa;
     

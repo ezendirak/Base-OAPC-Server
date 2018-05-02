@@ -11,6 +11,7 @@ import com.oapc.model.ErrorRest;
 import com.oapc.model.InfoEmpressa;
 import com.oapc.model.InfoGestioProd;
 import com.oapc.model.InfoRegistres;
+import com.oapc.model.NewProdDTO;
 import com.oapc.model.PDU;
 import com.oapc.model.Periode;
 import com.oapc.model.PeriodeDTO;
@@ -127,6 +128,34 @@ public class GestioEmpressaController {
 	 return registresTotals;
     }
     
+    //newEmp //post
+    
+    @Transactional(readOnly = false)
+	@PostMapping("/newEmp")
+	public void newEmpressa(@Valid @RequestBody InfoEmpressa newEmpressa) {
+	
+		Empressa existeix = empressaRepository.findByCodi(newEmpressa.getCodi());
+		if (existeix == null) {
+			existeix = new Empressa();
+			existeix.setCodi(newEmpressa.getCodi());
+			existeix.setEstat(newEmpressa.getEstat());
+			empressaRepository.save(existeix);
+			
+			for (String prod : newEmpressa.getTipusProductes()) {
+				Empressa temporal = empressaRepository.findByCodi(newEmpressa.getCodi());
+	        	EmpressaProducte temp = empressaProducteRepository.findAllListByProdAndEmpId(prod, temporal);
+	        	if(temp == null) {
+	        		EmpressaProducte updateEmpressaProd = new EmpressaProducte();
+	        		temp = new EmpressaProducte();
+	        		temp.setTipusProducte(prod);
+	        		temp.setEmpressa(temporal);
+	        		updateEmpressaProd = empressaProducteRepository.save(temp);
+	        	}
+			}
+		}
+//	    return null;
+	}
+    
     @Transactional(readOnly = false)
     @PutMapping("/gestioEmpressa")
     public ResponseEntity<Empressa> updateEmpressa(@Valid @RequestBody InfoEmpressa empressa) {
@@ -139,13 +168,19 @@ public class GestioEmpressaController {
         if(emp.getEstat() != Integer.valueOf(empressa.getEstat())) {
         	emp.setEstat(Integer.valueOf(empressa.getEstat()));
         }
+        EmpressaProducte updateEmpressaProd = new EmpressaProducte();
+        List<EmpressaProducte> empresaProd = empressaProducteRepository.findAllStreamByEmpressa(emp);
+        for (EmpressaProducte empressaProducte : empresaProd) {
+			empressaProducteRepository.delete(empressaProducte);
+		}
         
         for (String prod : empressa.getTipusProductes()) {
-        	EmpressaProducte temp = empressaProducteRepository.findAllListByProdAndEmpId(prod, emp.getId());
+        	EmpressaProducte temp = empressaProducteRepository.findAllListByProdAndEmpId(prod, emp);
         	if(temp == null) {
+        		temp = new EmpressaProducte();
         		temp.setTipusProducte(prod);
         		temp.setEmpressa(emp);
-        		EmpressaProducte updateEmpressaProd = empressaProducteRepository.save(temp);
+        		updateEmpressaProd = empressaProducteRepository.save(temp);
         	}
 		}
         
@@ -165,11 +200,10 @@ public class GestioEmpressaController {
     	 List<InfoEmpressa> empressesList = new ArrayList<InfoEmpressa>();
     	 for (Empressa empressa : registresTotals) {
     		 InfoEmpressa empr = new InfoEmpressa();
-    		 //NO FUNCIONA DE SOBTE , SENSE SENTIT, NO S'HA TOCAT RES
     		 List<EmpressaProducte> empresaProd = empressaProducteRepository.findAllStreamByEmpressa(empressa);
     		 empr.setCodi(empressa.getCodi());
     		 empr.setEstat(empressa.getEstat());
-    		 //AFEGIR EL PRODUCTE DEL STREAM EMPRESA PROD I GRAVAR
+    		 
     		 List<String> productes = new ArrayList<String>();
     	 		for (EmpressaProducte empre : empresaProd) {
     	 			productes.add(empre.getTipusProducte());
