@@ -5,13 +5,16 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.oapc.model.Empressa;
+import com.oapc.model.EmpressaProducte;
 import com.oapc.model.ErrorRegister;
 import com.oapc.model.ErrorRest;
+import com.oapc.model.InfoEmpressa;
 import com.oapc.model.InfoGestioProd;
 import com.oapc.model.InfoRegistres;
 import com.oapc.model.PDU;
 import com.oapc.model.Periode;
 import com.oapc.model.PeriodeDTO;
+import com.oapc.model.ProducteEmpressaPeriode;
 import com.oapc.model.Register;
 import com.oapc.model.RegisterDTO;
 import com.oapc.repo.EmpressaRepository;
@@ -69,18 +72,36 @@ public class GestioPeriodeController {
     EmpressaRepository empressaRepository;
 
    
+    @Transactional(readOnly = false)
+	@PostMapping("/newPeriodes")
+	public void newCalendar(@Valid @RequestBody List<PeriodeDTO> periodesNous) {
+    	List<PeriodeDTO> periodesErrors = new ArrayList<PeriodeDTO>();
+		for (PeriodeDTO periode : periodesNous) {
+			if(!periode.getNumPeriode().equals(null) && !periode.getTipusPeriode().equals(null)) {
+				Periode existeix = periodeRepository.findPeriodByNumType(periode.getNumPeriode(), periode.getTipusPeriode());
+				if(existeix == null) {
+					Periode periodeFinal = new Periode();
+					periodeFinal.setAny(periode.getAny());
+					periodeFinal.setData_inici(periode.getDataInici());
+					periodeFinal.setDataFi(periode.getDataFi());
+					periodeFinal.setNumPeriode(periode.getNumPeriode());
+					periodeFinal.setTipusPeriode(periode.getTipusPeriode());
+					periodeRepository.save(periodeFinal);
+				}else {
+					//El nou periode introduït te el mateix numero i tipus de periode que un periode existent
+					periodesErrors.add(periode);
+					//TODO enrregistrar els errors  (log o per pantalla)
+				}
+			}
+			
+		}
+		logger.info("Registres totals: "+ periodesNous.size() + ". Errors: (periodes repetits) " + periodesErrors.size());
+		
+	}
+    
     
     public List<Periode> filtrarAtributs(String periode, Date dataInici, Date dataFi, List<Periode> registresTotals) throws ParseException{
-//    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
-//    	Date dataInicial = new Date();
-//    	Date dataFinal = new Date();
-//    	LocalDate test = LocalDate.parse(dataInici);
-//    	LocalDate test2 = LocalDate.parse(dataFi);
-//    	dataInicial = Date.from(test.atStartOfDay(ZoneId.systemDefault()).toInstant());
-//    	dataFinal = Date.from(test2.atStartOfDay(ZoneId.systemDefault()).toInstant());
-//    	if (dataInici!=null) { dataInicial = formatter.parse(dataInici); }
-//    	if (dataFi!=null) { dataFinal = formatter.parse(dataFi); }
-    	
+
     	registresTotals = registresTotals.stream()
     			  .filter(x -> periode == null || x.getNumPeriode().equals(Character.getNumericValue(periode.charAt(0))))
     			  .filter(x -> periode == null || x.getTipusPeriode().equals(String.valueOf(periode.charAt(1))))
@@ -90,7 +111,6 @@ public class GestioPeriodeController {
     	
 	 return registresTotals;
     }
-    
     
     
     /////////////////////////////////////////////////////////////////////////////////////////////////////

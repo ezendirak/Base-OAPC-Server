@@ -23,11 +23,10 @@ public interface PeriodeRepository extends JpaRepository<Periode, Long> {
 	@Query("select p from Periode p where p.dataInici <= :formatedDate and p.dataFi >= :formatedDate order by p.numPeriode")
 	Stream<Periode> getDatesDisponibles(@Param("formatedDate") Date formatedDate);
 	
-	
 	@Query("select p from Periode p where p.dataInici >= :formatedDate and tipusPeriode = :tipusProduct order by p.numPeriode")
 	List<Periode> getDatesByProductAndDate(@Param("tipusProduct") String tipusProduct, @Param("formatedDate") Date formatedDate);
 	
 	@Query("select p from Periode p where p.numPeriode = :numPeriode and p.tipusPeriode = :tipusPeriode order by p.numPeriode")
-	Periode findRepoByNumType(@Param("numPeriode") Integer numPeriode, @Param("tipusPeriode") String tipusPeriode);
+	Periode findPeriodByNumType(@Param("numPeriode") Integer numPeriode, @Param("tipusPeriode") String tipusPeriode);
 	
 }

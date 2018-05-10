@@ -441,7 +441,7 @@ public class RegisterController {
     	if (periode != null) {
     		char numPeriode = periode.charAt(0);//numero de periode
         	char tipusPeriode = periode.charAt(1);//tipus de periode
-        	Periode periodeToSave = periodeRepository.findRepoByNumType(Character.getNumericValue(numPeriode), String.valueOf(tipusPeriode));	
+        	Periode periodeToSave = periodeRepository.findPeriodByNumType(Character.getNumericValue(numPeriode), String.valueOf(tipusPeriode));	
         	registresTotals = registresTotals.stream()
         			.filter(x -> periode   == null     || x.getPeriode().equals(periodeToSave))
   	              .collect(Collectors.toList());

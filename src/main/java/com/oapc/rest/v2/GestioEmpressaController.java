@@ -126,7 +126,7 @@ public class GestioEmpressaController {
 	 return registresTotals;
     }
     
-    //newEmp //post
+    
     
     @Transactional(readOnly = false)
 	@PostMapping("/newEmp")
@@ -451,7 +451,7 @@ public class GestioEmpressaController {
     	if (periode != null) {
     		char numPeriode = periode.charAt(0);//numero de periode
         	char tipusPeriode = periode.charAt(1);//tipus de periode
-        	Periode periodeToSave = periodeRepository.findRepoByNumType(Character.getNumericValue(numPeriode), String.valueOf(tipusPeriode));	
+        	Periode periodeToSave = periodeRepository.findPeriodByNumType(Character.getNumericValue(numPeriode), String.valueOf(tipusPeriode));	
         	registresTotals = registresTotals.stream()
         			.filter(x -> periode   == null     || x.getIdPeriode().equals(periodeToSave))
   	              .collect(Collectors.toList());
