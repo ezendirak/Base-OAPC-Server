@@ -14,16 +14,20 @@ import com.oapc.model.Periode;
 
 public interface PeriodeRepository extends JpaRepository<Periode, Long> {
 	
-	@Query("select p from Periode p")
+	@Query("select p from Periode p order by p.numPeriode")
 	List<Periode> findAllList();
 	
 	@Query("select p from Periode p order by id")
 	Stream<Periode> findAllStream();
 	
-	@Query("select p from Periode p where p.dataInici <= :formatedDate and p.dataFi >= :formatedDate")
+	@Query("select p from Periode p where p.dataInici <= :formatedDate and p.dataFi >= :formatedDate order by p.numPeriode")
 	Stream<Periode> getDatesDisponibles(@Param("formatedDate") Date formatedDate);
 	
-	@Query("select p from Periode p where p.numPeriode = :numPeriode and p.tipusPeriode = :tipusPeriode")
+	
+	@Query("select p from Periode p where p.dataInici >= :formatedDate and tipusPeriode = :tipusProduct order by p.numPeriode")
+	List<Periode> getDatesByProductAndDate(@Param("tipusProduct") String tipusProduct, @Param("formatedDate") Date formatedDate);
+	
+	@Query("select p from Periode p where p.numPeriode = :numPeriode and p.tipusPeriode = :tipusPeriode order by p.numPeriode")
 	Periode findRepoByNumType(@Param("numPeriode") Integer numPeriode, @Param("tipusPeriode") String tipusPeriode);
 	
 }

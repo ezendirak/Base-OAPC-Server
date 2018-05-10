@@ -39,7 +39,7 @@ public class RegisterDTO {
 //  @Column(name="CONT")
     private Float preuSortida;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
 	@JoinColumn(name="empresaInformant", nullable = false)
     private Empressa empressa;
     

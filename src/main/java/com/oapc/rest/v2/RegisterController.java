@@ -274,6 +274,7 @@ public class RegisterController {
         }
         
         Register updatedRegistre = registreRepository.save(registre);
+//        Register updateRegistre = registreRepository.c
         return ResponseEntity.ok(updatedRegistre);
     }
     
@@ -353,12 +354,12 @@ public class RegisterController {
     		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, 
     		@RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat, 
     		@RequestParam(value="periode", required=false) String periode, @RequestParam(value="qVenuda", required=false) String qVenuda, @RequestParam(value="qVenuda2", required=false) String qVenuda2,
-    		@RequestParam(value="pSortida", required=false) String pSortida, @RequestParam(value="pSortida2", required=false) String pSortida2)	    		    		    	
+    		@RequestParam(value="pSortida", required=false) String pSortida, @RequestParam(value="pSortida2", required=false) String pSortida2, @RequestParam(value="eInformant", required=false) String eInformant)	    		    		    	
     {    	    	 
 //    	 Stream<Register> registresTotals = registreRepository.findAllStream();
     	 List<Register> registresTotals = registreRepository.findAll();
     	 List<RegisterDTO> regis = new ArrayList<RegisterDTO>();
-    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals, qVenuda, qVenuda2, pSortida, pSortida2);
+    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals, qVenuda, qVenuda2, pSortida, pSortida2, eInformant);
     	 
     	 
     	 Integer page      = Integer.parseInt(spage);
@@ -410,30 +411,31 @@ public class RegisterController {
     public Long getRegisterCountFiltrat(@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, 
     		@RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat, 
     		@RequestParam(value="periode", required=false) String periode, @RequestParam(value="qVenuda", required=false) String qVenuda, @RequestParam(value="qVenuda2", required=false) String qVenuda2, 
-    		@RequestParam(value="pSortida", required=false) String pSortida, @RequestParam(value="pSortida2", required=false) String pSortida2)	    		    		    	
+    		@RequestParam(value="pSortida", required=false) String pSortida, @RequestParam(value="pSortida2", required=false) String pSortida2,@RequestParam(value="eInformant", required=false) String eInformant)	    		    		    	
     {    
     	
     	 List<Register> registresTotals = registreRepository.findAll();
     	 
-    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals, qVenuda, qVenuda2, pSortida, pSortida2);
+    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals, qVenuda, qVenuda2, pSortida, pSortida2, eInformant);
     	
     	 return registresTotals.stream().count();
     }
     
     
-    public List<Register> filtrarAtributs(String tipusProducte, String colorCarn, String qualitat, String calibre, String varietat, String periode, List<Register> registresTotals, String qVenuda, String qVenuda2, String pSortida, String pSortida2){
+    public List<Register> filtrarAtributs(String tipusProducte, String colorCarn, String qualitat, String calibre, String varietat, String periode, List<Register> registresTotals, String qVenuda, String qVenuda2, String pSortida, String pSortida2, String eInformant){
     	
-    	
+    	Empressa empressa = empressaRepository.findByCodi(eInformant);
     	registresTotals = registresTotals.stream()
-    			  .filter(x -> tipusProducte == null || x.getTipusProducte().equals(tipusProducte))
-	              .filter(x -> colorCarn     == null || x.getColorCarn().equals(colorCarn))
-	              .filter(x -> qualitat  == null     || x.getQualitat().equals(qualitat))
-	              .filter(x -> calibre   == null     || x.getCalibre().equals(calibre))
-	              .filter(x -> varietat  == null     || x.getVarietat().equals(varietat))
-	              .filter(x -> qVenuda == null		 || x.getQuantitatVenuda() > Long.valueOf(qVenuda))
-	              .filter(x -> qVenuda2 == null		 || x.getQuantitatVenuda() < Long.valueOf(qVenuda2))
-	              .filter(x -> pSortida == null		 || x.getQuantitatVenuda() > Long.valueOf(pSortida))
-	              .filter(x -> pSortida2 == null		 || x.getQuantitatVenuda() < Long.valueOf(pSortida2))
+    			  .filter(x -> tipusProducte == null 	|| 	x.getTipusProducte().equals(tipusProducte))
+	              .filter(x -> colorCarn     == null 	|| 	x.getColorCarn().equals(colorCarn))
+	              .filter(x -> qualitat  == null     	|| 	x.getQualitat().equals(qualitat))
+	              .filter(x -> calibre   == null     	|| 	x.getCalibre().equals(calibre))
+	              .filter(x -> varietat  == null     	|| 	x.getVarietat().equals(varietat))
+	              .filter(x -> qVenuda == null		 	|| 	x.getQuantitatVenuda() > Long.valueOf(qVenuda))
+	              .filter(x -> qVenuda2 == null		 	|| 	x.getQuantitatVenuda() < Long.valueOf(qVenuda2))
+	              .filter(x -> pSortida == null		 	|| 	x.getPreuSortida() > Long.valueOf(pSortida))
+	              .filter(x -> pSortida2 == null		|| 	x.getPreuSortida() < Long.valueOf(pSortida2))
+	              .filter(x -> eInformant == null		||	x.getEmpressa().equals(empressa))
 	              .collect(Collectors.toList());
     	
     	if (periode != null) {
@@ -522,7 +524,8 @@ public class RegisterController {
 //    	Date formatedDate = Date.from(Instant.parse(dateConverting));2018-05-07
     	LocalDate localDate = LocalDate.parse(dateConverting, formatter2);
 //    	LocalDate localDate2 = LocalDate.parse("2018-05-08", formatter2);
-    	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponibles(java.sql.Date.valueOf(localDate));
+
+    	Stream<Periode> streamPeriode = periodeRepository.findAllStream();
     	if (subGrup.equals("PI")) {
     		streamPeriode = streamPeriode.filter(x -> x.getTipusPeriode().equals("S"));
     	}else if (subGrup.equals("LL")) {

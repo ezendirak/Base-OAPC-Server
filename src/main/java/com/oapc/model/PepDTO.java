@@ -6,18 +6,13 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.sun.glass.ui.View;
 
-@Entity
-@Table(name = "producteEmpressaPeriode")
-public class ProducteEmpressaPeriode {
+
+public class PepDTO {
 	
-	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-	private Timestamp dataUltimRegistre;
+	private Timestamp dataUltimReg;
 	
 	private Boolean pendent;
 	
@@ -27,16 +22,11 @@ public class ProducteEmpressaPeriode {
 	
 	private Boolean tancat;
 	
-
-	@JsonBackReference
-	@ManyToOne
-	@JoinColumn(name="periode_id", nullable = false)
-	private Periode periode;
+	private String periode;
 	
+	private String tipusProducte;
 	
-	@OneToOne
-	@JoinColumn(name="empressaProduct_id", nullable = false)
-	private EmpressaProducte empressaProducte;
+	private String codiEmpresa;
 	
     
     public Long getId() {
@@ -47,20 +37,20 @@ public class ProducteEmpressaPeriode {
 		this.id = id;
 	}
 
-	public Periode getIdPeriode() {
+	public String getIdPeriode() {
 		return periode;
 	}
 
-	public void setIdPeriode(Periode periode) {
+	public void setIdPeriode(String periode) {
 		this.periode = periode;
 	}
 
 	public Timestamp getDataUltimRegistre() {
-		return dataUltimRegistre;
+		return dataUltimReg;
 	}
 
 	public void setDataUltimRegistre(Timestamp dataUltimRegistre) {
-		this.dataUltimRegistre = dataUltimRegistre;
+		this.dataUltimReg = dataUltimRegistre;
 	}
 
 	public Boolean getPendent() {
@@ -95,12 +85,20 @@ public class ProducteEmpressaPeriode {
 		this.tancat = tancat;
 	}
 	
-	public EmpressaProducte getEmpressaProducte() {
-		return empressaProducte;
+	public String getEmpressaProducte() {
+		return tipusProducte;
 	}
 	
-	public void setEmpressaProducte(EmpressaProducte empressaProducte) {
-		this.empressaProducte = empressaProducte;
+	public void setEmpressaProducte(String empressaProducte) {
+		this.tipusProducte = empressaProducte;
+	}
+
+	public String getCodiEmpresa() {
+		return codiEmpresa;
+	}
+
+	public void setCodiEmpresa(String codiEmpresa) {
+		this.codiEmpresa = codiEmpresa;
 	}
 	
 }

@@ -22,9 +22,9 @@ public class PeriodeDTO {
 	
 	private Integer numPeriode;
 	
-	private Timestamp dataInici;
+	private Date dataInici;
 	
-	private Timestamp dataFi;
+	private Date dataFi;
 	
 	private Integer duracio;
 	
@@ -33,7 +33,7 @@ public class PeriodeDTO {
 		
 	}
 	
-	public PeriodeDTO(String tipusPeriode, Integer any, Integer numPeriode, Timestamp dataInici, Timestamp dataFi, Integer duracio) {
+	public PeriodeDTO(String tipusPeriode, Integer any, Integer numPeriode, Date dataInici, Date dataFi, Integer duracio) {
 		this.tipusPeriode = tipusPeriode;
 		this.any = any;
 		this.numPeriode = numPeriode;
@@ -75,19 +75,19 @@ public class PeriodeDTO {
 		this.numPeriode = numPeriode;
 	}
 
-	public Timestamp getDataInici() {
+	public Date getDataInici() {
 		return dataInici;
 	}
 
-	public void setData_inici(Timestamp dataInici) {
+	public void setData_inici(Date dataInici) {
 		this.dataInici = dataInici;
 	}
 
-	public Timestamp getDataFi() {
+	public Date getDataFi() {
 		return dataFi;
 	}
 
-	public void setDataFi(Timestamp dataFi) {
+	public void setDataFi(Date dataFi) {
 		this.dataFi = dataFi;
 	}
 

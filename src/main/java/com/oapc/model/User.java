@@ -66,7 +66,7 @@ public class User implements UserDetails {
     private List<Authority> authorities;
 
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
 	@JoinColumn(name = "rol_id", nullable = false)
 	private Rols rol;
     

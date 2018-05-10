@@ -25,9 +25,9 @@ public class Periode {
 	
 	private Integer numPeriode;
 	
-	private Timestamp dataInici;
+	private Date dataInici;
 	
-	private Timestamp dataFi;
+	private Date dataFi;
 	
 	private Integer duracio;
 	
@@ -45,6 +45,7 @@ public class Periode {
 	@OneToMany(mappedBy = "periode")
 	private Set<ErrorRegister> errorRegisters = new HashSet();
 	
+	@JsonManagedReference
 	@OneToMany(mappedBy = "periode")
 	private Set<ProducteEmpressaPeriode> producteEmpressaPeriode = new HashSet();
 	
@@ -52,7 +53,7 @@ public class Periode {
 		
 	}
 	
-	public Periode(String tipusPeriode, Integer any, Integer numPeriode, Timestamp dataInici, Timestamp dataFi, Integer duracio) {
+	public Periode(String tipusPeriode, Integer any, Integer numPeriode, Date dataInici, Date dataFi, Integer duracio) {
 		this.tipusPeriode = tipusPeriode;
 		this.any = any;
 		this.numPeriode = numPeriode;
@@ -94,19 +95,19 @@ public class Periode {
 		this.numPeriode = numPeriode;
 	}
 
-	public Timestamp getDataInici() {
+	public Date getDataInici() {
 		return dataInici;
 	}
 
-	public void setData_inici(Timestamp dataInici) {
+	public void setData_inici(Date dataInici) {
 		this.dataInici = dataInici;
 	}
 
-	public Timestamp getDataFi() {
+	public Date getDataFi() {
 		return dataFi;
 	}
 
-	public void setDataFi(Timestamp dataFi) {
+	public void setDataFi(Date dataFi) {
 		this.dataFi = dataFi;
 	}
 

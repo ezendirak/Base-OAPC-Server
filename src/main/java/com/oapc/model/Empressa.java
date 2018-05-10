@@ -19,7 +19,7 @@ public class Empressa {
 	
 	private Integer estat;
 
-	@JsonManagedReference
+//	@JsonManagedReference
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "empressa")
 	private Set<EmpressaProducte> empressaProducte = new HashSet();
 	
@@ -29,7 +29,7 @@ public class Empressa {
 	@OneToMany(mappedBy = "empressa")
 	private Set<Register> register = new HashSet();
 	
-	@JsonManagedReference
+//	@JsonManagedReference
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "empressa")
 	private Set<ErrorRegister> errorRegister = new HashSet();
 	

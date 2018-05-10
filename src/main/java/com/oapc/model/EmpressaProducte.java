@@ -22,12 +22,12 @@ public class EmpressaProducte {
 	@OneToOne(cascade = CascadeType.ALL, mappedBy = "empressaProducte")
 	private ProducteEmpressaPeriode producteEmpressaPeriode;
 	
-	@JsonBackReference
+	
 	@ManyToOne
 	@JoinColumn(name="empressa_id", nullable = false)
 	private Empressa empressa;
-	
 	public Long getId() {
+		
 		return id;
 	}
 

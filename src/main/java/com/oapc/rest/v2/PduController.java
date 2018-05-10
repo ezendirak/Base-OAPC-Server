@@ -219,6 +219,18 @@ public class PduController {
     }
     
     
+    public String getProductsType(String producte){
+    	String tipus;
+    	Stream<PDU> pduStream = pduRepository.getProducteByDades("PRODUCTE", producte);
+    	
+    	for (PDU registre : pduStream.collect(Collectors.toList())) {
+    		
+    		tipus = registre.getDatos().substring(32, 34).trim();
+    		return tipus;
+		}
+    	return null;
+    }
+    
     @Transactional(readOnly = true)
     @GetMapping("/pdu/productesModal")
     public List<InfoRegistres> getProductsNameForModal(){
@@ -276,7 +288,7 @@ public class PduController {
 			atributs.add(atribut.getClave());
 		}
     	
-    	if (atributs.size() > 1) {
+    	if (atributs.size() > 2) {
     		List<String> producteKey = new ArrayList<String>();
     		for (String producte : atributs) {
 				producteKey.add(producte);
