@@ -10,6 +10,7 @@ import com.oapc.model.InfoRegistres;
 import com.oapc.model.NewProdDTO;
 import com.oapc.model.PDU;
 import com.oapc.model.Periode;
+import com.oapc.model.PeriodeDTO;
 import com.oapc.model.Register;
 import com.oapc.model.RegisterDTO;
 import com.oapc.repo.PduRepository;
@@ -241,12 +242,37 @@ public class PduController {
     	for (PDU registre : pduStream.collect(Collectors.toList())) {
 //			productes.add(registre.getDatos().substring(0, 25).trim());
 //			productes.add(registre.getClave());
+    		
     		InfoRegistres producte = new InfoRegistres();
     		producte.setClau(registre.getClave());
     		producte.setNom(registre.getDatos().substring(0, 25).trim());
     		producte.setSubGrup(registre.getDatos().substring(32, 34).trim());
     		producte.setId(registre.getId());
     		productes.add(producte);
+		}
+    	return productes;
+    }
+    
+    @Transactional(readOnly = true)
+    @GetMapping("/productesModalByType/{subGrup}")
+    public List<InfoRegistres> getProductsByType(@PathVariable(value = "subGrup", required=false) String subGrup){
+    	String vacio = "";
+    	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
+    	
+    	List<InfoRegistres> productes = new ArrayList<InfoRegistres>();
+    	for (PDU registre : pduStream.collect(Collectors.toList())) {
+//			productes.add(registre.getDatos().substring(0, 25).trim());
+//			productes.add(registre.getClave());
+    		if ((subGrup.equals("S") && registre.getDatos().substring(32, 34).trim().equals("PI")) ||
+    			(subGrup.equals("Q") && registre.getDatos().substring(32, 34).trim().equals("LL"))	) {
+    			InfoRegistres producte = new InfoRegistres();
+        		producte.setClau(registre.getClave());
+        		producte.setNom(registre.getDatos().substring(0, 25).trim());
+        		producte.setSubGrup(registre.getDatos().substring(32, 34).trim());
+        		producte.setId(registre.getId());
+        		productes.add(producte);
+    		}
+    		
 		}
     	return productes;
     }

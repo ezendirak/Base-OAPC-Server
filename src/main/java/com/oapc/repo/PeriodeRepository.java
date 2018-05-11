@@ -20,8 +20,12 @@ public interface PeriodeRepository extends JpaRepository<Periode, Long> {
 	@Query("select p from Periode p order by id")
 	Stream<Periode> findAllStream();
 	
-	@Query("select p from Periode p where p.dataInici <= :formatedDate and p.dataFi >= :formatedDate order by p.numPeriode")
-	Stream<Periode> getDatesDisponibles(@Param("formatedDate") Date formatedDate);
+//	Inicialment s'utilitzava la data actual per treure els periodes a partir d'avui. Ara treuren directament els periodes que tinguin duracio > 0.	
+//	@Query("select p from Periode p where p.dataInici <= :formatedDate and p.dataFi >= :formatedDate order by p.numPeriode")
+//	Stream<Periode> getDatesDisponibles(@Param("formatedDate") Date formatedDate);
+	
+	@Query("select p from Periode p where p.duracio > 0 and p.id IN (select DISTINCT(periode) from ProducteEmpressaPeriode o where o.pendent = true)")
+	Stream<Periode> getDatesDisponibles();
 	
 	@Query("select p from Periode p where p.dataInici >= :formatedDate and tipusPeriode = :tipusProduct order by p.numPeriode")
 	List<Periode> getDatesByProductAndDate(@Param("tipusProduct") String tipusProduct, @Param("formatedDate") Date formatedDate);

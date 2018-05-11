@@ -34,7 +34,8 @@ public class ProducteEmpressaPeriode {
 	private Periode periode;
 	
 	
-	@OneToOne
+	@JsonBackReference
+	@ManyToOne
 	@JoinColumn(name="empressaProduct_id", nullable = false)
 	private EmpressaProducte empressaProducte;
 	

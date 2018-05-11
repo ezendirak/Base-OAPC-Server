@@ -484,15 +484,15 @@ public class RegisterController {
     @GetMapping("/periodesDisponibles")
     public List<PeriodeDTO> getPeriodesDisponibles() throws ParseException{
     	
-    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    	DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    	Date dataActual = new Date();
-    	
-    	String dateConverting = formatter.format(dataActual);
-//    	Date formatedDate = Date.from(Instant.parse(dateConverting));2018-05-07
-    	LocalDate localDate = LocalDate.parse(dateConverting, formatter2);
-//    	LocalDate localDate2 = LocalDate.parse("2018-05-08", formatter2);
-    	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponibles(java.sql.Date.valueOf(localDate));
+//    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+//    	DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//    	Date dataActual = new Date();
+//    	
+//    	String dateConverting = formatter.format(dataActual);
+////    	Date formatedDate = Date.from(Instant.parse(dateConverting));2018-05-07
+//    	LocalDate localDate = LocalDate.parse(dateConverting, formatter2);
+////    	LocalDate localDate2 = LocalDate.parse("2018-05-08", formatter2);
+    	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponibles();
     	List<PeriodeDTO> periodesList = new ArrayList<PeriodeDTO>();
     	
     	for (Periode peri : streamPeriode.collect(Collectors.toList())) {
@@ -516,16 +516,8 @@ public class RegisterController {
     @GetMapping("/periodesByProd/{subGrup}")
     public List<PeriodeDTO> getPeriodesByProd(@PathVariable(value = "subGrup", required=false) String subGrup){
     	
-    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    	DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    	Date dataActual = new Date();
-    	
-    	String dateConverting = formatter.format(dataActual);
-//    	Date formatedDate = Date.from(Instant.parse(dateConverting));2018-05-07
-    	LocalDate localDate = LocalDate.parse(dateConverting, formatter2);
-//    	LocalDate localDate2 = LocalDate.parse("2018-05-08", formatter2);
 
-    	Stream<Periode> streamPeriode = periodeRepository.findAllStream();
+    	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponibles();
     	if (subGrup.equals("PI")) {
     		streamPeriode = streamPeriode.filter(x -> x.getTipusPeriode().equals("S"));
     	}else if (subGrup.equals("LL")) {
@@ -548,4 +540,7 @@ public class RegisterController {
 //    	return streamPeriode.collect(Collectors.toList());
     	return periodesList;
     }
+    
+//    @PathVariable(value = "subGrup", required=false) String subGrup
+    
 }
