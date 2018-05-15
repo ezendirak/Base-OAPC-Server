@@ -14,6 +14,7 @@ import com.oapc.model.Periode;
 import com.oapc.model.ProducteEmpressaPeriode;
 import com.oapc.model.Register;
 import com.oapc.model.RegisterDTO;
+import com.oapc.model.RegistreNoComPerDTO;
 import com.oapc.repo.EmpressaProducteRepository;
 import com.oapc.repo.EmpressaRepository;
 import com.oapc.repo.PduRepository;
@@ -78,6 +79,19 @@ public class GestioEmpressaController {
     	List<Empressa> empressesList = empressaRepository.findAll();
     	List<String> empList = new ArrayList<String>();
     	empList.add("Totes");
+    	for (Empressa empressa : empressesList) {
+			empList.add(empressa.getCodi());
+		}
+    	return empList;
+    }
+    
+    
+    @Transactional(readOnly = true)
+    @GetMapping("/empresesByProd/{producte}")
+    public List<String> getEmpressesByProducte(@PathVariable(value = "producte", required=false) String producte){
+    	
+    	List<Empressa> empressesList = empressaRepository.getEmpresesByProd(producte);
+    	List<String> empList = new ArrayList<String>();
     	for (Empressa empressa : empressesList) {
 			empList.add(empressa.getCodi());
 		}
@@ -257,6 +271,20 @@ public class GestioEmpressaController {
     	
     	return ResponseEntity.ok(pepToUpdate);
     }
+    
+    @Transactional(readOnly = false)
+    @PutMapping("/regNoComPer")
+    public ResponseEntity<Empressa> updateRegNoComPer(@Valid @RequestBody RegistreNoComPerDTO registre) {
+
+//    	Empressa emp = empressaRepository.findByCodi(registre.getEmpresa());
+//    	EmpressaProducte temporal = empressaProducteRepository.findAllListByProdAndEmpId(registre.getProducte(), emp);
+    	Periode emp = periodeRepository.findOne(registre.getPeriode());
+    	ProducteEmpressaPeriode test = producteEmpressaPeriodeRepository.findByPerProdAndCodiEmp(emp, registre.getProducte(), registre.getEmpresa());
+    	test.setNo_comercialitzacio(true);
+    	producteEmpressaPeriodeRepository.save(test);
+    	return null;
+    }
+    
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////PAGINATION////////////////////////////////////////////////////
     

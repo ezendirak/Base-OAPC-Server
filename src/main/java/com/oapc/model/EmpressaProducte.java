@@ -20,7 +20,7 @@ public class EmpressaProducte {
 //	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "empressa")
 //	private Set<EmpressaProducte> empressaProducte = new HashSet();
 	
-	@JsonManagedReference
+	@JsonManagedReference("empPro")
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "empressaProducte")
 	private Set<ProducteEmpressaPeriode> producteEmpressaPeriode = new HashSet();
 	

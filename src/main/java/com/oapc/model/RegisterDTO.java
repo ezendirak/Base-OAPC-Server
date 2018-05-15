@@ -2,20 +2,15 @@ package com.oapc.model;
 
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
 
 public class RegisterDTO {
 	
-	@Id
     private Long id;
 
 //	@Column(name="TABLA", length=10)
-    private String  periode;
+    private PeriodeDTO  periode;
 
 	
 //	@Column(name="CLAVE", length=30)
@@ -52,14 +47,13 @@ public class RegisterDTO {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	
-//	@JsonIgnore
-	
-	public String getPeriode() {
+	public PeriodeDTO getPeriode() {
 		return periode;
 	}
 
-	public void setPeriode(String periode) {
+	public void setPeriode(PeriodeDTO periode) {
 		this.periode = periode;
 	}
 
@@ -126,8 +120,6 @@ public class RegisterDTO {
 	public void setPreuSortida(Float preuSortida) {
 		this.preuSortida = preuSortida;
 	}
-
-
 
         
 }

@@ -125,7 +125,14 @@ public class RegisterController {
         test.setColorCarn(note.getColorCarn());
         test.setId(note.getId());
         test.setTipusProducte(note.getTipusProducte());
-        test.setPeriode(note.getPeriode().getNumPeriode().toString());
+        PeriodeDTO periodeTest = new PeriodeDTO();
+	        periodeTest.setAny(note.getPeriode().getAny());
+	        periodeTest.setData_inici(note.getPeriode().getDataInici());
+	        periodeTest.setDataFi(note.getPeriode().getDataFi());
+	        periodeTest.setNumPeriode(note.getPeriode().getNumPeriode());
+	        periodeTest.setTipusPeriode(note.getPeriode().getTipusPeriode());
+	        periodeTest.setId(note.getPeriode().getId());
+	        test.setPeriode(periodeTest);
         test.setPreuSortida(note.getPreuSortida());
         test.setQualitat(note.getQualitat());
         test.setQuantitatVenuda(note.getQuantitatVenuda());
@@ -137,7 +144,7 @@ public class RegisterController {
 //    private String[] combos = {"COLORCARN", "VARIETAT", "QUALITAT", "CALIBRE"};
     @PostMapping("/registres")
     public Register createRegister(@Valid @RequestBody RegisterDTO registre) {
-    	Periode peri = periodeRepository.findOne(Long.valueOf(registre.getPeriode()));
+    	Periode peri = periodeRepository.findOne(Long.valueOf(registre.getPeriode().getId()));
     	Empressa emp = empressaRepository.findOne(2L);
 //    	Empressa emp2 = empressaRepository.findById(1L);
 //    	long prova = registre.getPeriode();
@@ -181,7 +188,7 @@ public class RegisterController {
     		logger.info("ERROR. El calibre "+ registre.getCalibre() + " no està donat d'alta.");
     		
     	}else {
-    		Periode peri = periodeRepository.findOne(Long.valueOf(registre.getPeriode()));
+    		Periode peri = periodeRepository.findOne(Long.valueOf(registre.getPeriode().getId()));
         	Empressa emp = empressaRepository.findOne(2L);
 //        	Empressa emp2 = empressaRepository.findById(1L);
 //        	long prova = registre.getPeriode();
@@ -307,45 +314,46 @@ public class RegisterController {
     
     @GetMapping("/registres")
     public List<Register> getAllRegisters() {
-    	return registreRepository.findAll();        
+    	List<Register> test = registreRepository.findAll();
+    	return test;        
     }
     
     
-    @Transactional(readOnly = true)
-    @GetMapping("/filtro")
-    public List<RegisterDTO> getRegistresFiltrats(@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat)	    		    		    	
-    {    	    	 
-//    	 Stream<Register> registresTotals = registreRepository.findAllStream();
-    	 List<Register> registresTotals = registreRepository.findAll();
-    	 List<RegisterDTO> regis = new ArrayList<RegisterDTO>();
-    	 if (registresTotals != null && (tipusProducte != null && !tipusProducte.isEmpty())) {
-    		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
-    		 
-    		
-    		registresTotals = registresTotals.stream()
-    				              .filter(x -> colorCarn == null || x.getColorCarn().equals(colorCarn))
-    				              .filter(x -> qualitat  == null || x.getQualitat().equals(qualitat))
-    				              .filter(x -> calibre   == null || x.getCalibre().equals(calibre))
-    				              .filter(x -> varietat  == null || x.getVarietat().equals(varietat))
-    				              .collect(Collectors.toList());
-    		
-    		
-    		for (Register register : registresTotals) {
-    			
-    			RegisterDTO test = new RegisterDTO();
-    	        test.setCalibre(register.getCalibre());
-    	        test.setColorCarn(register.getColorCarn());
-    	        test.setId(register.getId());
-    	        test.setTipusProducte(register.getTipusProducte());
-    	        test.setPeriode(register.getPeriode().getNumPeriode().toString());
-    	        test.setPreuSortida(register.getPreuSortida());
-    	        test.setQualitat(register.getQualitat());
-    	        test.setQuantitatVenuda(register.getQuantitatVenuda());
-    	        regis.add(test);
-			}
-    	 }
-    	 return regis;     
-    }
+//    @Transactional(readOnly = true)
+//    @GetMapping("/filtro")
+//    public List<RegisterDTO> getRegistresFiltrats(@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat)	    		    		    	
+//    {    	    	 
+////    	 Stream<Register> registresTotals = registreRepository.findAllStream();
+//    	 List<Register> registresTotals = registreRepository.findAll();
+//    	 List<RegisterDTO> regis = new ArrayList<RegisterDTO>();
+//    	 if (registresTotals != null && (tipusProducte != null && !tipusProducte.isEmpty())) {
+//    		 registresTotals = registresTotals.stream().filter(x -> x.getTipusProducte().equals(tipusProducte)).collect(Collectors.toList());
+//    		 
+//    		
+//    		registresTotals = registresTotals.stream()
+//    				              .filter(x -> colorCarn == null || x.getColorCarn().equals(colorCarn))
+//    				              .filter(x -> qualitat  == null || x.getQualitat().equals(qualitat))
+//    				              .filter(x -> calibre   == null || x.getCalibre().equals(calibre))
+//    				              .filter(x -> varietat  == null || x.getVarietat().equals(varietat))
+//    				              .collect(Collectors.toList());
+//    		
+//    		
+//    		for (Register register : registresTotals) {
+//    			
+//    			RegisterDTO test = new RegisterDTO();
+//    	        test.setCalibre(register.getCalibre());
+//    	        test.setColorCarn(register.getColorCarn());
+//    	        test.setId(register.getId());
+//    	        test.setTipusProducte(register.getTipusProducte());
+//    	        test.setPeriode(register.getPeriode().getNumPeriode().toString());
+//    	        test.setPreuSortida(register.getPreuSortida());
+//    	        test.setQualitat(register.getQualitat());
+//    	        test.setQuantitatVenuda(register.getQuantitatVenuda());
+//    	        regis.add(test);
+//			}
+//    	 }
+//    	 return regis;     
+//    }
     
     
     @Transactional(readOnly = true)
@@ -393,7 +401,14 @@ public class RegisterController {
  	        test.setColorCarn(register.getColorCarn());
  	        test.setId(register.getId());
  	        test.setTipusProducte(register.getTipusProducte());
- 	        test.setPeriode(register.getPeriode().getNumPeriode().toString());
+ 	        PeriodeDTO periodeTest = new PeriodeDTO();
+ 	        periodeTest.setAny(register.getPeriode().getAny());
+ 	        periodeTest.setData_inici(register.getPeriode().getDataInici());
+ 	        periodeTest.setDataFi(register.getPeriode().getDataFi());
+ 	        periodeTest.setNumPeriode(register.getPeriode().getNumPeriode());
+ 	        periodeTest.setTipusPeriode(register.getPeriode().getTipusPeriode());
+ 	        periodeTest.setId(register.getPeriode().getId());
+ 	        test.setPeriode(periodeTest);
  	        test.setPreuSortida(register.getPreuSortida());
  	        test.setQualitat(register.getQualitat());
  	        test.setQuantitatVenuda(register.getQuantitatVenuda());
@@ -484,14 +499,6 @@ public class RegisterController {
     @GetMapping("/periodesDisponibles")
     public List<PeriodeDTO> getPeriodesDisponibles() throws ParseException{
     	
-//    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-//    	DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//    	Date dataActual = new Date();
-//    	
-//    	String dateConverting = formatter.format(dataActual);
-////    	Date formatedDate = Date.from(Instant.parse(dateConverting));2018-05-07
-//    	LocalDate localDate = LocalDate.parse(dateConverting, formatter2);
-////    	LocalDate localDate2 = LocalDate.parse("2018-05-08", formatter2);
     	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponibles();
     	List<PeriodeDTO> periodesList = new ArrayList<PeriodeDTO>();
     	
@@ -543,4 +550,28 @@ public class RegisterController {
     
 //    @PathVariable(value = "subGrup", required=false) String subGrup
     
+    @Transactional(readOnly = true)
+    @GetMapping("/periByProductes/{productes}")
+    public List<PeriodeDTO> getPerByProducte(@PathVariable(value = "productes", required=false) String productes){
+    	
+
+    	List<Periode> periodesDisponibles = periodeRepository.getPeriodesByProductes(productes);
+    	
+    	
+    	List<PeriodeDTO> periodesList = new ArrayList<PeriodeDTO>();
+    	
+    	for (Periode peri : periodesDisponibles) {
+			PeriodeDTO temp = new PeriodeDTO();
+			temp.setAny(peri.getAny());
+			temp.setData_inici(peri.getDataInici());
+			temp.setDataFi(peri.getDataFi());
+			temp.setDuracio(peri.getDuracio());
+			temp.setId(peri.getId());
+			temp.setNumPeriode(peri.getNumPeriode());
+			temp.setTipusPeriode(peri.getTipusPeriode());
+			periodesList.add(temp);
+		}
+//    	return streamPeriode.collect(Collectors.toList());
+    	return periodesList;
+    }
 }

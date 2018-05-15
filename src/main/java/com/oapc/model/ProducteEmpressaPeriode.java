@@ -28,13 +28,13 @@ public class ProducteEmpressaPeriode {
 	private Boolean tancat;
 	
 
-	@JsonBackReference
+	@JsonBackReference("periode")
 	@ManyToOne
 	@JoinColumn(name="periode_id", nullable = false)
 	private Periode periode;
 	
 	
-	@JsonBackReference
+	@JsonBackReference("empPro")
 	@ManyToOne
 	@JoinColumn(name="empressaProduct_id", nullable = false)
 	private EmpressaProducte empressaProducte;

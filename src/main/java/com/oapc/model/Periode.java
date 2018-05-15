@@ -45,12 +45,11 @@ public class Periode {
 	@OneToMany(mappedBy = "periode")
 	private Set<ErrorRegister> errorRegisters = new HashSet();
 	
-	@JsonManagedReference
+	@JsonManagedReference("periode")
 	@OneToMany(mappedBy = "periode")
 	private Set<ProducteEmpressaPeriode> producteEmpressaPeriode = new HashSet();
 	
 	public Periode() {
-		
 	}
 	
 	public Periode(String tipusPeriode, Integer any, Integer numPeriode, Date dataInici, Date dataFi, Integer duracio) {
