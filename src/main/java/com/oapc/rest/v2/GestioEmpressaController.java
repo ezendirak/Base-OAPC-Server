@@ -481,9 +481,7 @@ public class GestioEmpressaController {
     	
     	registresTotals = registresTotals.stream()
     			  .filter(x -> tipusProducte == null || x.getEmpressaProducte().getTipusProducte().equals(tipusProducte))
-//	              .filter(x -> periode     == null || x.getIdPeriode().equals(periode.getId()))
 	              .filter(x -> empressa  == null     || x.getEmpressaProducte().getEmpressa().getCodi().equals(empressa))
-//	              .filter(x -> estat   == null     || x.get.equals(calibre))
 	              .collect(Collectors.toList());
     	
     	if(estat != null) {
