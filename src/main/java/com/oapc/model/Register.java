@@ -3,6 +3,7 @@ package com.oapc.model;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
@@ -51,6 +52,7 @@ public class Register {
     
     public Register() {}
     
+    @JsonIgnore
     public Long getId() {
 		return id;
 	}
@@ -60,7 +62,7 @@ public class Register {
 	}
 	
 //	@JsonIgnore
-	
+	@JsonIgnore
 	public Periode getPeriode() {
 		return periode;
 	}
@@ -69,6 +71,7 @@ public class Register {
 		this.periode = periode;
 	}
 
+	@JsonIgnore
 	public String getTipusProducte() {
 		return tipusProducte;
 	}
@@ -77,6 +80,7 @@ public class Register {
 		this.tipusProducte = tipusProducte;
 	}
 
+	@JsonIgnore
 	public String getVarietat() {
 		return varietat;
 	}
@@ -85,6 +89,7 @@ public class Register {
 		this.varietat = varietat;
 	}
 
+	@JsonIgnore
 	public String getColorCarn() {
 		return colorCarn;
 	}
@@ -93,6 +98,7 @@ public class Register {
 		this.colorCarn = colorCarn;
 	}
 
+	@JsonIgnore
 	public String getQualitat() {
 		return qualitat;
 	}
@@ -101,6 +107,7 @@ public class Register {
 		this.qualitat = qualitat;
 	}
 
+	@JsonIgnore
 	public String getCalibre() {
 		return calibre;
 	}
@@ -109,6 +116,7 @@ public class Register {
 		this.calibre = calibre;
 	}
 
+	@JsonIgnore
 	public Long getQuantitatVenuda() {
 		return quantitatVenuda;
 	}
@@ -117,6 +125,7 @@ public class Register {
 		this.quantitatVenuda = quantitatVenuda;
 	}
 
+	@JsonIgnore
 	public Empressa getEmpressa() {
 		return empressa;
 	}
@@ -125,6 +134,7 @@ public class Register {
 		this.empressa = empressa;
 	}
 	
+	@JsonIgnore
 	public Float getPreuSortida() {
 		return preuSortida;
 	}

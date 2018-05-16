@@ -27,6 +27,9 @@ public class EmpressaProducte {
 	
 	@ManyToOne
 	@JoinColumn(name="empressa_id", nullable = false)
+//	@JoinTable(	name="empressa_id", 
+//				joinColumns= @JoinColumn(name="", referencedColumnName = "id"),
+//				inverseJoinColumns = @JoinColumn(name = "", referencedColumnName = "id"))
 	private Empressa empressa;
 	public Long getId() {
 		
