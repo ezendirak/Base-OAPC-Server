@@ -7,6 +7,7 @@ import com.oapc.model.Empressa;
 import com.oapc.model.EmpressaProducte;
 import com.oapc.model.ErrorRest;
 import com.oapc.model.InfoEmpressa;
+import com.oapc.model.InfoEmpressa2;
 import com.oapc.model.InfoRegistres;
 import com.oapc.model.PDU;
 import com.oapc.model.PepDTO;
@@ -144,18 +145,18 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = false)
 	@PostMapping("/newEmp")
-	public void newEmpressa(@Valid @RequestBody InfoEmpressa newEmpressa) {
+	public void newEmpressa(@Valid @RequestBody InfoEmpressa2 newEmpressa) {
 	
 		Empressa existeix = empressaRepository.findByCodi(newEmpressa.getCodi());
 		if (existeix == null) {
 			existeix = new Empressa();
 			existeix.setCodi(newEmpressa.getCodi());
-			existeix.setEstat(newEmpressa.getEstat());
+			existeix.setEstat(Integer.valueOf(newEmpressa.getEstat().getValor()));
 			//Es crea la nova empressa
 			empressaRepository.save(existeix);
-			
+			Empressa temporal = empressaRepository.findByCodi(newEmpressa.getCodi());
 			for (String prod : newEmpressa.getTipusProductes()) {
-				Empressa temporal = empressaRepository.findByCodi(newEmpressa.getCodi());
+				
 	        	EmpressaProducte temp = empressaProducteRepository.findAllListByProdAndEmpId(prod, temporal);
 	        	if(temp == null) {
 	        		EmpressaProducte updateEmpressaProd = new EmpressaProducte();
@@ -168,7 +169,7 @@ public class GestioEmpressaController {
 			}
 			//TODO crear producteEmpressaPeriode pels periodes actuals i endavant que falten per la nova empressa i els seus productes
 		
-			Empressa temporal = empressaRepository.findByCodi(newEmpressa.getCodi());
+//			Empressa temporal = empressaRepository.findByCodi(newEmpressa.getCodi());
 			List<EmpressaProducte> listProdByEmp = empressaProducteRepository.findAllStreamByEmpressa(temporal);
 			
 			for (EmpressaProducte empressaProducte : listProdByEmp) {
@@ -189,13 +190,19 @@ public class GestioEmpressaController {
 				}
 				List<Periode> periodes = periodeRepository.getDatesByProductAndDate(typePeriod,getDataActualPerQuery());
 				for (Periode periode : periodes) {
-					toSave.setIdPeriode(periode);
-					producteEmpressaPeriodeRepository.save(toSave);
+					ProducteEmpressaPeriode regFinal = new ProducteEmpressaPeriode();
+					regFinal.setEmpressaProducte(toSave.getEmpressaProducte());
+					regFinal.setNo_comercialitzacio(toSave.getNoComercialitzacio());
+					regFinal.setPendent(toSave.getPendent());
+					regFinal.setRegistrat(toSave.getRegistrat());
+					regFinal.setTancat(toSave.getTancat());
+					regFinal.setIdPeriode(periode);
+					producteEmpressaPeriodeRepository.save(regFinal);
 				}
 				
 			}
 		}
-//	    l'empressa ja existeix
+//	    l'empressa amb aquest codi ja existeix
 	}
     
     public Date getDataActualPerQuery() {
@@ -211,15 +218,15 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = false)
     @PutMapping("/gestioEmpressa")
-    public ResponseEntity<Empressa> updateEmpressa(@Valid @RequestBody InfoEmpressa empressa) {
+    public ResponseEntity<Empressa> updateEmpressa(@Valid @RequestBody InfoEmpressa2 empressa) {
 
     	Empressa emp = empressaRepository.findByCodi(empressa.getCodi());
     	
         if(emp == null) {
             return ResponseEntity.notFound().build();
         }
-        if(emp.getEstat() != Integer.valueOf(empressa.getEstat())) {
-        	emp.setEstat(Integer.valueOf(empressa.getEstat()));
+        if(emp.getEstat() != Integer.valueOf(empressa.getEstat().getValor())) {
+        	emp.setEstat(Integer.valueOf(empressa.getEstat().getValor()));
         }
         EmpressaProducte updateEmpressaProd = new EmpressaProducte();
         List<EmpressaProducte> empresaProd = empressaProducteRepository.findAllStreamByEmpressa(emp);
@@ -235,9 +242,42 @@ public class GestioEmpressaController {
         		temp.setEmpressa(emp);
         		updateEmpressaProd = empressaProducteRepository.save(temp);
         	}
-		}
-        
+		}//TODO producteEmpressaPeriode
         Empressa updatedEmpressa = empressaRepository.save(emp);
+        
+        List<EmpressaProducte> listProdByEmp = empressaProducteRepository.findAllStreamByEmpressa(updatedEmpressa);
+		
+		for (EmpressaProducte empressaProducte : listProdByEmp) {
+			ProducteEmpressaPeriode toSave = new ProducteEmpressaPeriode();
+			toSave.setNo_comercialitzacio(false);
+			toSave.setPendent(false);
+			toSave.setRegistrat(false);
+			toSave.setTancat(true);
+			toSave.setEmpressaProducte(empressaProducte);
+			//empressaProducte.getTipusProducte();
+			String typeProduct = pduController.getProductsType(empressaProducte.getTipusProducte());
+			String typePeriod = new String();
+			
+			if(typeProduct.equals("PI")) {
+				typePeriod = "S";
+			}else if (typeProduct.equals("LL")) {
+				typePeriod = "Q";
+			}
+			List<Periode> periodes = periodeRepository.getDatesByProductAndDate(typePeriod,getDataActualPerQuery());
+			for (Periode periode : periodes) {
+				ProducteEmpressaPeriode regFinal = new ProducteEmpressaPeriode();
+				regFinal.setEmpressaProducte(toSave.getEmpressaProducte());
+				regFinal.setNo_comercialitzacio(toSave.getNoComercialitzacio());
+				regFinal.setPendent(toSave.getPendent());
+				regFinal.setRegistrat(toSave.getRegistrat());
+				regFinal.setTancat(toSave.getTancat());
+				regFinal.setIdPeriode(periode);
+				producteEmpressaPeriodeRepository.save(regFinal);
+			}
+			
+		}
+
+        
         return ResponseEntity.ok(updatedEmpressa);
     }
     
