@@ -14,8 +14,8 @@ public class Rols {
 
 	private String rol;
 	
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "rol")
-	private User user;
+//	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "rol")
+//	private User user;
 	
 	public Long getId() {
 		return id;

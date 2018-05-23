@@ -65,18 +65,18 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
     private List<Authority> authorities;
 
-    @JsonIgnore
-    @OneToOne
-	@JoinColumn(name = "rol_id", nullable = false)
-	private Rols rol;
-    
-    public Rols getRol() {
-    	return rol;
-    }
-    
-    public void setRol(Rols rol) {
-    	this.rol = rol;
-    }
+//    @JsonIgnore
+//    @OneToOne
+//	@JoinColumn(name = "rol_id", nullable = false)
+//	private Rols rol;
+//    
+//    public Rols getRol() {
+//    	return rol;
+//    }
+//    
+//    public void setRol(Rols rol) {
+//    	this.rol = rol;
+//    }
     
     public Long getId() {
         return id;

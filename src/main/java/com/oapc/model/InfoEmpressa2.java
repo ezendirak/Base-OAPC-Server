@@ -5,6 +5,7 @@ import java.util.*;
 
 public class InfoEmpressa2 {
 	
+	private Long id;
 	
     private String codi;
 
@@ -49,6 +50,16 @@ public class InfoEmpressa2 {
 
 	public void setEstat(Estat estat) {
 		this.estat = estat;
+	}
+
+
+	public Long getId() {
+		return id;
+	}
+
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 	

@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.sun.glass.ui.View;
@@ -48,6 +49,7 @@ public class ProducteEmpressaPeriode {
 		this.id = id;
 	}
 
+	@JsonIgnore
 	public Periode getIdPeriode() {
 		return periode;
 	}
@@ -96,6 +98,7 @@ public class ProducteEmpressaPeriode {
 		this.tancat = tancat;
 	}
 	
+	@JsonIgnore
 	public EmpressaProducte getEmpressaProducte() {
 		return empressaProducte;
 	}

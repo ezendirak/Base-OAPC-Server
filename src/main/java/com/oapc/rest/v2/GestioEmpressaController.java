@@ -13,8 +13,6 @@ import com.oapc.model.PDU;
 import com.oapc.model.PepDTO;
 import com.oapc.model.Periode;
 import com.oapc.model.ProducteEmpressaPeriode;
-import com.oapc.model.Register;
-import com.oapc.model.RegisterDTO;
 import com.oapc.model.RegistreNoComPerDTO;
 import com.oapc.repo.EmpressaProducteRepository;
 import com.oapc.repo.EmpressaRepository;
@@ -27,6 +25,7 @@ import com.oapc.rest.v2.PduController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,6 +74,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/allEmpresses")
+    @PreAuthorize("hasRole('GESTOR')")
     public List<String> getEmpressesName(){
     	
     	List<Empressa> empressesList = empressaRepository.findAll();
@@ -89,6 +89,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/empresesByProd/{producte}")
+    @PreAuthorize("hasRole('GESTOR')")
     public List<String> getEmpressesByProducte(@PathVariable(value = "producte", required=false) String producte){
     	
     	List<Empressa> empressesList = empressaRepository.getEmpresesByProd(producte);
@@ -101,6 +102,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/productesModal")
+    @PreAuthorize("hasRole('GESTOR')")
     public List<InfoRegistres> getProductsName2(){
     	String vacio = "";
     	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
@@ -119,6 +121,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/nomProductesModal")
+    @PreAuthorize("hasRole('GESTOR')")
     public List<String> getProductsName3(){
     	String vacio = "";
     	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
@@ -145,6 +148,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = false)
 	@PostMapping("/newEmp")
+    @PreAuthorize("hasRole('GESTOR')")
 	public void newEmpressa(@Valid @RequestBody InfoEmpressa2 newEmpressa) {
 	
 		Empressa existeix = empressaRepository.findByCodi(newEmpressa.getCodi());
@@ -218,15 +222,21 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = false)
     @PutMapping("/gestioEmpressa")
-    public ResponseEntity<Empressa> updateEmpressa(@Valid @RequestBody InfoEmpressa2 empressa) {
+    @PreAuthorize("hasRole('GESTOR')")
+    public ResponseEntity<Empressa> updateEmpressa(@Valid @RequestBody InfoEmpressa2 empresa) {
 
-    	Empressa emp = empressaRepository.findByCodi(empressa.getCodi());
+    	Empressa emp = empressaRepository.findOne(empresa.getId());
     	
         if(emp == null) {
             return ResponseEntity.notFound().build();
         }
-        if(emp.getEstat() != Integer.valueOf(empressa.getEstat().getValor())) {
-        	emp.setEstat(Integer.valueOf(empressa.getEstat().getValor()));
+        
+        if(!emp.getCodi().equals(empresa.getCodi())) {
+        	emp.setCodi(empresa.getCodi());
+        }
+        
+        if(emp.getEstat() != Integer.valueOf(empresa.getEstat().getValor())) {
+        	emp.setEstat(Integer.valueOf(empresa.getEstat().getValor()));
         }
         EmpressaProducte updateEmpressaProd = new EmpressaProducte();
         List<EmpressaProducte> empresaProd = empressaProducteRepository.findAllStreamByEmpressa(emp);
@@ -234,7 +244,7 @@ public class GestioEmpressaController {
 			empressaProducteRepository.delete(empressaProducte);
 		}
         
-        for (String prod : empressa.getTipusProductes()) {
+        for (String prod : empresa.getTipusProductes()) {
         	EmpressaProducte temp = empressaProducteRepository.findAllListByProdAndEmpId(prod, emp);
         	if(temp == null) {
         		temp = new EmpressaProducte();
@@ -283,6 +293,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = false)
     @PutMapping("/gestioPeriode")
+    @PreAuthorize("hasRole('GESTOR')")
     public ResponseEntity<ProducteEmpressaPeriode> updatePeriodeProdEmp(@Valid @RequestBody List<String> productes) {
     	List<ProducteEmpressaPeriode> registres = producteEmpressaPeriodeRepository.findAllListByProd(productes);
     	for (ProducteEmpressaPeriode producteEmpressaPeriode : registres) {
@@ -298,6 +309,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = false)
     @PutMapping("/gestioPep")
+    @PreAuthorize("hasRole('GESTOR')")
     public ResponseEntity<ProducteEmpressaPeriode> updatePep(@Valid @RequestBody PepDTO objPep) {
     	ProducteEmpressaPeriode pepToUpdate = producteEmpressaPeriodeRepository.findOne(objPep.getId());
     	if (pepToUpdate != null) {
@@ -314,6 +326,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = false)
     @PutMapping("/regNoComPer")
+    @PreAuthorize("hasRole('GESTOR')")
     public ResponseEntity<Empressa> updateRegNoComPer(@Valid @RequestBody RegistreNoComPerDTO registre) {
 
 //    	Empressa emp = empressaRepository.findByCodi(registre.getEmpresa());
@@ -330,6 +343,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/empressesFiltrat")
+    @PreAuthorize("hasRole('GESTOR')")
     public ResponseEntity<?> getRegistresFiltratsPaginats(@RequestParam(value="page",     defaultValue="0") String spage,
     		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value = "estat", required=false) String estat, @RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value = "codiEmpressa", required=false) String codiEmpressa)	    		    		    	
     {    	
@@ -340,7 +354,7 @@ public class GestioEmpressaController {
     		 List<EmpressaProducte> empresaProd = empressaProducteRepository.findAllStreamByEmpressa(empressa);
     		 empr.setCodi(empressa.getCodi());
     		 empr.setEstat(empressa.getEstat());
-    		 
+    		 empr.setId(empressa.getId());
     		 List<String> productes = new ArrayList<String>();
     	 		for (EmpressaProducte empre : empresaProd) {
     	 			productes.add(empre.getTipusProducte());
@@ -379,6 +393,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/empresses_countFiltrat")
+    @PreAuthorize("hasRole('GESTOR')")
     public Long getRegisterCountFiltrat(@RequestParam(value = "estat", required=false) String estat, @RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value = "codiEmpressa", required=false) String codiEmpressa)	    		    		    	
     {    
     	
@@ -407,6 +422,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/registresPEPFiltrat")
+    @PreAuthorize("hasRole('GESTOR')")
     public ResponseEntity<?> getRegistresPEPFiltratsPaginats(@RequestParam(value="page",     defaultValue="0") String spage,
     		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value = "periode", required=false) String periode, 
     		@RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value="empresa", required=false) String empresa, 
@@ -464,6 +480,7 @@ public class GestioEmpressaController {
 //    
     @Transactional(readOnly = true)
     @GetMapping("/registresPEP_count")
+    @PreAuthorize("hasRole('GESTOR')")
     public Long getRegisterPEPCountFiltrat(@RequestParam(value = "periode", required=false) String periode, @RequestParam(value="tipusProducte", required=false) String tipusProducte, 
     		@RequestParam(value="empressa", required=false) String empressa, @RequestParam(value="estat", required=false) String estat)	    		    		    	
     {    

@@ -3,17 +3,11 @@ package com.oapc.rest.v2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.oapc.model.Empressa;
-import com.oapc.model.ErrorRegister;
 import com.oapc.model.ErrorRest;
 import com.oapc.model.InfoGestioProd;
 import com.oapc.model.InfoRegistres;
 import com.oapc.model.PDU;
-import com.oapc.model.Periode;
-import com.oapc.model.PeriodeDTO;
 import com.oapc.model.Register;
-import com.oapc.model.RegisterDTO;
 import com.oapc.repo.EmpressaRepository;
 import com.oapc.repo.PduRepository;
 import com.oapc.repo.PeriodeRepository;
@@ -23,19 +17,13 @@ import com.oapc.rest.v2.PduController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -79,6 +67,7 @@ public class GestioProdController {
     
     @Transactional(readOnly = true)
     @GetMapping("/atributsProd")
+    @PreAuthorize("hasRole('GESTOR')")
     public List<InfoGestioProd> getAllAtributsFromProds()	    		    		    	
     {    
     	List<InfoGestioProd> regiToGestioProd = new ArrayList<InfoGestioProd>();
@@ -128,13 +117,14 @@ public class GestioProdController {
     
     
     @PutMapping("/gestioProducte")
+    @PreAuthorize("hasRole('GESTOR')")
     public ResponseEntity<PDU> updateRegister(@Valid @RequestBody InfoGestioProd registerDetails) {
     	
 //    	Register registre = registreRepository.findOne(registerDetails.getId());
     	PDU registre = pduRepository.findOne(registerDetails.getIdProducte());
     	PDU updatedRegistre = new PDU();
     	if ((registerDetails.getProducte() != null) && registre.getDatos().substring(0, 25).trim() != registerDetails.getProducte()) {
-    		//HEM MODIFICAT EL PRODUCTE
+    		//HEM MODIFICAT EL NOM DEL PRODUCTE
     		if (registerDetails.getProducte().length() < 26) {
     			String temporal = registre.getDatos().substring(26, 34);
     			String newProduct = registerDetails.getProducte();
@@ -143,7 +133,7 @@ public class GestioProdController {
     				newProduct = newProduct + " ";
     			}
     			newProduct = newProduct + temporal;
-    			actualitzarRegistres(registre.getDatos().substring(0, 25).trim(), newProduct2, 1);
+    			actualitzarRegistres(registre.getDatos().substring(0, 25).trim(), newProduct2, 1, null);
     			registre.setDatos(newProduct);
     			//Guarda
     			updatedRegistre = pduRepository.save(registre);
@@ -155,8 +145,9 @@ public class GestioProdController {
     	PDU registre2 = pduRepository.findOne(registerDetails.getIdRegistre());
     	if ((registerDetails.getValor() != null) && registre2.getDatos() != registerDetails.getValor()) {
     		//HEM MODIFICAT EL VALOR D'UN ATRIBUT
+    		
+    		actualitzarRegistres(registre2.getDatos(), registerDetails.getValor(), 2, registre.getDatos().substring(0, 25).trim());
     		registre2.setDatos(registerDetails.getValor());
-    		actualitzarRegistres(registre2.getDatos(), registerDetails.getValor(), 2);
     		updatedRegistre = pduRepository.save(registre2);
     	}
         
@@ -165,7 +156,7 @@ public class GestioProdController {
     }
     
     
-    public void actualitzarRegistres(String valorAntic, String valorNou, Integer taula) {
+    public void actualitzarRegistres(String valorAntic, String valorNou, Integer taula, String producte) {
     	//Si no tenim cap registre amb aquest nom de producte, es un nom nou
     	List<Register> registres = registreRepository.findAll();
     	
@@ -179,19 +170,19 @@ public class GestioProdController {
     			}
     		}else if (taula == 2) {
     			
-    			if (register.getCalibre().equals(valorAntic)) {
+    			if (register.getCalibre().equals(valorAntic) && register.getTipusProducte().equals(producte)) {
     				register.setCalibre(valorNou);
     				registreRepository.save(register);
     				
-    			}else if (register.getColorCarn().equals(valorAntic)) {
+    			}else if (register.getColorCarn().equals(valorAntic) && register.getTipusProducte().equals(producte)) {
     				register.setColorCarn(valorNou);
     				registreRepository.save(register);
     				
-    			}else if (register.getQualitat().equals(valorAntic)) {
+    			}else if (register.getQualitat().equals(valorAntic) && register.getTipusProducte().equals(producte)) {
     				register.setQualitat(valorNou);
     				registreRepository.save(register);
     			
-    			}else if (register.getVarietat().equals(valorAntic)) {
+    			}else if (register.getVarietat().equals(valorAntic) && register.getTipusProducte().equals(producte)) {
     				register.setVarietat(valorNou);
     				registreRepository.save(register);
     			}
@@ -204,6 +195,7 @@ public class GestioProdController {
     
     @Transactional(readOnly = true)
     @GetMapping("/atributsProdFiltrat")
+    @PreAuthorize("hasRole('GESTOR')")
     public ResponseEntity<?> getRegistresFiltratsPaginats(@RequestParam(value="page",     defaultValue="0") String spage,
     		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value = "familia", required=false) String familia, @RequestParam(value="tipusProducte", required=false) String tipusProducte)	    		    		    	
     {    	    	 
@@ -240,6 +232,7 @@ public class GestioProdController {
     
     @Transactional(readOnly = true)
     @GetMapping("/atributsProd_countFiltrat")
+    @PreAuthorize("hasRole('GESTOR')")
     public Long getRegisterCountFiltrat(@RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value="familia", required=false) String familia)	    		    		    	
     {    
     	

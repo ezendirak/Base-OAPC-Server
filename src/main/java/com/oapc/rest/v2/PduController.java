@@ -4,20 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.oapc.model.AtributsCombo;
-import com.oapc.model.Empressa;
 import com.oapc.model.ErrorRest;
 import com.oapc.model.InfoRegistres;
 import com.oapc.model.NewProdDTO;
 import com.oapc.model.PDU;
-import com.oapc.model.Periode;
-import com.oapc.model.PeriodeDTO;
-import com.oapc.model.Register;
-import com.oapc.model.RegisterDTO;
 import com.oapc.repo.PduRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +43,7 @@ public class PduController {
     //enviem un atribut i ens retorna tots els valors posibles (atribut => colorcarn o varietat o qualitat o calibre...)
     @Transactional(readOnly = true)
     @GetMapping("/pdu/datos/{datos}")
+    @PreAuthorize("hasRole('GESTOR')")
     public List<PDU> getAllColors(@PathVariable(value = "datos") String datos) {
     	logger.info("PDU: " + datos);
     	for (String pduTaula : taules) {
@@ -83,6 +80,7 @@ public class PduController {
     
     @Transactional(readOnly = true)
     @GetMapping("/pdu_page")
+    @PreAuthorize("hasRole('GESTOR')")
     public ResponseEntity<?> getAllPduPage(
     		@RequestParam(value="page",     defaultValue="0") String spage,
     		@RequestParam(value="per_page", defaultValue="0") String sper_page
@@ -121,6 +119,7 @@ public class PduController {
     
     @Transactional(readOnly = true)
     @GetMapping("/pdu_count")
+    @PreAuthorize("hasRole('GESTOR')")
     public Long getPduCount()	    		    		    	
     {    	    	 
     	 Stream<PDU> stream_cont = pduRepository.findAllStream();    	 	     
@@ -152,6 +151,7 @@ public class PduController {
     //Dona la clau, no el name
     @Transactional(readOnly = true)
     @GetMapping("/pdu/productes")
+    @PreAuthorize("hasRole('GESTOR')")
     public List<String> getProductsName(){
     	String vacio = "";
     	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
@@ -179,6 +179,7 @@ public class PduController {
     
     @Transactional(readOnly = true)
     @GetMapping("/pdu/PROPDU")
+    @PreAuthorize("hasRole('GESTOR')")
     public List<InfoRegistres> getProductsName2(){
     	String vacio = "";
     	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
@@ -200,6 +201,7 @@ public class PduController {
     
     @Transactional(readOnly = true)
     @GetMapping("/pdu/FAMPDU")
+    @PreAuthorize("hasRole('GESTOR')")
     public List<InfoRegistres> getFamilyName(){
     	String vacio = "";
     	Stream<PDU> pduStream = pduRepository.getDades("SUBGRUP", vacio);
@@ -234,6 +236,7 @@ public class PduController {
     
     @Transactional(readOnly = true)
     @GetMapping("/pdu/productesModal")
+    @PreAuthorize("hasRole('GESTOR')")
     public List<InfoRegistres> getProductsNameForModal(){
     	String vacio = "";
     	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
@@ -255,6 +258,7 @@ public class PduController {
     
     @Transactional(readOnly = true)
     @GetMapping("/productesModalByType/{subGrup}")
+    @PreAuthorize("hasRole('GESTOR')")
     public List<InfoRegistres> getProductsByType(@PathVariable(value = "subGrup", required=false) String subGrup){
     	String vacio = "";
     	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
@@ -279,6 +283,7 @@ public class PduController {
     
     @Transactional(readOnly = true)
     @GetMapping("/pdu/combos/{tipusProducte}")
+    @PreAuthorize("hasRole('GESTOR')")
     public AtributsCombo getCombos(@PathVariable(value = "tipusProducte") String tipusProducte){
     	
     	AtributsCombo atributsCombo = new AtributsCombo(); 
@@ -488,6 +493,7 @@ public class PduController {
     
     @Transactional(readOnly = true)
     @GetMapping("/pduCombos")
+    @PreAuthorize("hasRole('GESTOR')")
     public Map<String, AtributsCombo> getAllCombosProducts() {
     	List<String> ProductsNames = getProductsName();
     	Map<String, AtributsCombo> combosByProduct = new HashMap<String, AtributsCombo>();
@@ -499,6 +505,7 @@ public class PduController {
     
     @Transactional(readOnly = true)
     @GetMapping("/pduNamedCombos")
+    @PreAuthorize("hasRole('GESTOR')")
     public Map<String, AtributsCombo> getAllCombosNamesProducts() {
     	List<String> ProductsNames = getProductsTrueNames();
     	Map<String, AtributsCombo> combosByProduct = new HashMap<String, AtributsCombo>();
@@ -515,6 +522,7 @@ public class PduController {
    
     @Transactional(readOnly = true)
     @GetMapping("/pdu/ModalCombosToAdd/{tipusProducte}")
+    @PreAuthorize("hasRole('GESTOR')")
     public AtributsCombo getCombosModalToAdd(@PathVariable(value = "tipusProducte") String tipusProducte){
     	
     	AtributsCombo atributsCombo = new AtributsCombo(); 
@@ -674,6 +682,7 @@ public AtributsCombo combosAmbProducteModalToAdd(String producteKey, AtributsCom
 
 	@Transactional(readOnly = false)
 	@PostMapping("/newAtribut")
+	@PreAuthorize("hasRole('GESTOR')")
 	public PDU newAtribut(@Valid @RequestBody NewProdDTO atributByProd) {
 	
 		PDU atribut = pduRepository.findOne(atributByProd.getIdProd());

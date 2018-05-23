@@ -3,20 +3,9 @@ package com.oapc.rest.v2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.oapc.model.Empressa;
-import com.oapc.model.EmpressaProducte;
-import com.oapc.model.ErrorRegister;
 import com.oapc.model.ErrorRest;
-import com.oapc.model.InfoEmpressa;
-import com.oapc.model.InfoGestioProd;
-import com.oapc.model.InfoRegistres;
-import com.oapc.model.PDU;
 import com.oapc.model.Periode;
 import com.oapc.model.PeriodeDTO;
-import com.oapc.model.ProducteEmpressaPeriode;
-import com.oapc.model.Register;
-import com.oapc.model.RegisterDTO;
 import com.oapc.repo.EmpressaRepository;
 import com.oapc.repo.PduRepository;
 import com.oapc.repo.PeriodeRepository;
@@ -26,26 +15,19 @@ import com.oapc.rest.v2.PduController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 @RestController
@@ -74,6 +56,7 @@ public class GestioPeriodeController {
    
     @Transactional(readOnly = false)
 	@PostMapping("/newPeriodes")
+    @PreAuthorize("hasRole('GESTOR')")
 	public void newCalendar(@Valid @RequestBody List<PeriodeDTO> periodesNous) {
     	List<PeriodeDTO> periodesErrors = new ArrayList<PeriodeDTO>();
 		for (PeriodeDTO periode : periodesNous) {
@@ -130,6 +113,7 @@ public class GestioPeriodeController {
     
     @Transactional(readOnly = true)
     @GetMapping("/periodesFiltrat")
+    @PreAuthorize("hasRole('GESTOR')")
     public ResponseEntity<?> getRegistresFiltratsPaginats(@RequestParam(value="page",     defaultValue="0") String spage,
     		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value="periode", required=false) String periode,
     		@RequestParam(value="dataInici", required=false) Date dataInici, @RequestParam(value="dataFi", required=false) Date dataFi) throws ParseException	    		    		    	
@@ -181,6 +165,7 @@ public class GestioPeriodeController {
     
     @Transactional(readOnly = true)
     @GetMapping("/periodes_countFiltrat")
+    @PreAuthorize("hasRole('GESTOR')")
     public Long getRegisterCountFiltrat(@RequestParam(value="periode", required=false) String periode,
     		@RequestParam(value="dataInici", required=false) Date dataInici, @RequestParam(value="dataFi", required=false) Date dataFi) throws ParseException	    		    		    	
     {    

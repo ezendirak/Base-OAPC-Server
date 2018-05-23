@@ -22,7 +22,10 @@ public interface ProducteEmpressaPeriodeRepository extends JpaRepository<Product
 	@Query("select p from ProducteEmpressaPeriode p order by id")
 	Stream<ProducteEmpressaPeriode> findAllStream();
 	
-	@Query("select x from ProducteEmpressaPeriode x where x.id IN (select id from EmpressaProducte where tipusProducte IN :productes)")
+//	@Query("select x from ProducteEmpressaPeriode x where x.id IN (select id from EmpressaProducte where tipusProducte IN :productes)")
+//	List<ProducteEmpressaPeriode> findAllListByProd(@Param("productes") List<String> productes);
+	
+	@Query("select x from ProducteEmpressaPeriode x where x.tancat != 1 and x.noComercialitzacio != 1 and x.empressaProducte IN (select id from EmpressaProducte where tipusProducte IN :productes)")
 	List<ProducteEmpressaPeriode> findAllListByProd(@Param("productes") List<String> productes);
 	
 	@Query("select x from ProducteEmpressaPeriode x where x.empressaProducte = (select id from EmpressaProducte where empressa = (select id from Empressa where codi = :codiProd))")

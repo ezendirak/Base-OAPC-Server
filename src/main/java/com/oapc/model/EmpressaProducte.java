@@ -5,6 +5,7 @@ import java.util.*;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -31,6 +32,7 @@ public class EmpressaProducte {
 //				joinColumns= @JoinColumn(name="", referencedColumnName = "id"),
 //				inverseJoinColumns = @JoinColumn(name = "", referencedColumnName = "id"))
 	private Empressa empressa;
+	
 	public Long getId() {
 		
 		return id;
@@ -48,6 +50,7 @@ public class EmpressaProducte {
 		this.tipusProducte = tipusProducte;
 	}
 	
+	@JsonIgnore
 	public Empressa getEmpressa() {
 		return empressa;
 	}

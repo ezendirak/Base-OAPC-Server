@@ -5,6 +5,7 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -66,6 +67,7 @@ public class Empressa {
 		this.estat = estat;
 	}
 	
+	@JsonIgnore
 	public Set<EmpressaProducte> getEmpressaProducte() {
 		return empressaProducte;
 	}
@@ -74,6 +76,7 @@ public class Empressa {
 		this.empressaProducte = empressaProducte;
 	}
 	
+	@JsonIgnore
 	public Set<Register> getRegisters() {
 		return register;
 	}
@@ -82,6 +85,7 @@ public class Empressa {
 		this.register = register;
 	}
 	
+	@JsonIgnore
 	public Set<ErrorRegister> getErrorRegister() {
 		return errorRegister;
 	}
