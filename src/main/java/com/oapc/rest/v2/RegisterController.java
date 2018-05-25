@@ -9,6 +9,7 @@ import com.oapc.model.Periode;
 import com.oapc.model.PeriodeDTO;
 import com.oapc.model.Register;
 import com.oapc.model.RegisterDTO;
+import com.oapc.model.RegisterExcelDTO;
 import com.oapc.repo.EmpressaRepository;
 import com.oapc.repo.PduRepository;
 import com.oapc.repo.PeriodeRepository;
@@ -163,9 +164,9 @@ public class RegisterController {
         return registreRepository.save(regi);
     }
     
-    @PostMapping("/fromExcelRegistres")
+    @PostMapping("/fromExcelRegistres/{familia}")
     @PreAuthorize("hasRole('GESTOR')")
-    public Register createRegisterFromExcel(@Valid @RequestBody RegisterDTO registre, @RequestParam(value = "Familia", required=false) String familia) {
+    public Register createRegisterFromExcel(@PathVariable(value = "familia") Long familia, @Valid @RequestBody RegisterExcelDTO registre) {
     	
     	if(!pduController.existeEn("PRODUCTE", registre.getTipusProducte())) {
     		//ERROR EN EL TIPUS DE PRODUCTE
@@ -173,11 +174,11 @@ public class RegisterController {
 //    		ErrorRegister errorRegistre = new ErrorRegister();
 //    		errorRegistre.setTipusProducte(registre.getTipusProducte());
     		//funcio general per pasar de registre a Error
-    	}else if (!pduController.existeEn("COLORCARN", registre.getColorCarn()) && familia == "1") {
+    	}else if (!pduController.existeEn("COLORCARN", registre.getColorCarn()) && familia == 1) {
     		//ERROR EN EL COLOR DE LA CARN
     		logger.info("ERROR. El color de carn "+ registre.getColorCarn() + " no està donat d'alta.");
     		
-    	}else if (!pduController.existeEn("VARIETAT", registre.getVarietat()) && familia == "2") {
+    	}else if (!pduController.existeEn("VARIETAT", registre.getVarietat()) && familia == 2) {
     		//ERROR EN LA VARIETAT
     		logger.info("ERROR. La varietat "+ registre.getVarietat() + " no està donat d'alta.");
     		
@@ -190,7 +191,10 @@ public class RegisterController {
     		logger.info("ERROR. El calibre "+ registre.getCalibre() + " no està donat d'alta.");
     		
     	}else {
-    		Periode peri = periodeRepository.findOne(Long.valueOf(registre.getPeriode().getId()));
+    		Periode peri = new Periode();
+    		if (familia == 1) { peri = periodeRepository.findPeriodByNumType(registre.getPeriode(), "S"); }
+    		else if (familia == 2) { peri = periodeRepository.findPeriodByNumType(registre.getPeriode(), "Q"); }
+    		
         	Empressa emp = empressaRepository.findOne(2L);
 //        	Empressa emp2 = empressaRepository.findById(1L);
 //        	long prova = registre.getPeriode();
