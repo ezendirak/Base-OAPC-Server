@@ -143,14 +143,13 @@ public class GestioProdController {
     		}
     	}
     	PDU registre2 = pduRepository.findOne(registerDetails.getIdRegistre());
-    	if ((registerDetails.getValor() != null) && registre2.getDatos() != registerDetails.getValor()) {
+    	if ((registerDetails.getValor() != null) && registre2.getDatos().equals(registerDetails.getValor())) {
     		//HEM MODIFICAT EL VALOR D'UN ATRIBUT
     		
     		actualitzarRegistres(registre2.getDatos(), registerDetails.getValor(), 2, registre.getDatos().substring(0, 25).trim());
     		registre2.setDatos(registerDetails.getValor());
     		updatedRegistre = pduRepository.save(registre2);
     	}
-        
 //        Register updatedRegistre = registreRepository.save(registre);
         return ResponseEntity.ok(updatedRegistre);
     }

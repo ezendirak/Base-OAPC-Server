@@ -239,6 +239,7 @@ public class GestioEmpressaController {
         	emp.setEstat(Integer.valueOf(empresa.getEstat().getValor()));
         }
         EmpressaProducte updateEmpressaProd = new EmpressaProducte();
+        
         List<EmpressaProducte> empresaProd = empressaProducteRepository.findAllStreamByEmpressa(emp);
         for (EmpressaProducte empressaProducte : empresaProd) {
 			empressaProducteRepository.delete(empressaProducte);
@@ -304,6 +305,18 @@ public class GestioEmpressaController {
 			
 			producteEmpressaPeriode = producteEmpressaPeriodeRepository.save(producteEmpressaPeriode);
 		}
+    	return null;
+    }
+    
+    
+    @Transactional(readOnly = false)
+    @PutMapping("/deleteEmpresa")
+    @PreAuthorize("hasRole('GESTOR')")
+    public ResponseEntity<ProducteEmpressaPeriode> deleteEmp(@Valid @RequestBody InfoEmpressa empresa) {
+    	Empressa emp = empressaRepository.findById(empresa.getId());
+    	if (emp != null) {
+    		emp.setEstat(0);
+    	}
     	return null;
     }
     

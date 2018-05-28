@@ -3,12 +3,16 @@ package com.oapc.rest.v2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.oapc.model.EmpressaProducte;
 import com.oapc.model.ErrorRest;
 import com.oapc.model.Periode;
 import com.oapc.model.PeriodeDTO;
+import com.oapc.model.ProducteEmpressaPeriode;
+import com.oapc.repo.EmpressaProducteRepository;
 import com.oapc.repo.EmpressaRepository;
 import com.oapc.repo.PduRepository;
 import com.oapc.repo.PeriodeRepository;
+import com.oapc.repo.ProducteEmpressaPeriodeRepository;
 import com.oapc.repo.RegisterRepository;
 import com.oapc.rest.v2.PduController;
 
@@ -52,7 +56,15 @@ public class GestioPeriodeController {
     
     @Autowired
     EmpressaRepository empressaRepository;
+    
+    @Autowired
+    EmpressaProducteRepository empressaProducteRepository;
+    
+    @Autowired
+    ProducteEmpressaPeriodeRepository producteEmpressaPeriodeRepository;
 
+    @Autowired
+    GestioEmpressaController	gestioEmpressaController;
    
     @Transactional(readOnly = false)
 	@PostMapping("/newPeriodes")
@@ -70,6 +82,46 @@ public class GestioPeriodeController {
 					periodeFinal.setNumPeriode(periode.getNumPeriode());
 					periodeFinal.setTipusPeriode(periode.getTipusPeriode());
 					periodeRepository.save(periodeFinal);
+					
+					////////////////////////////////////////////////////
+					
+					List<EmpressaProducte> listEmpProd = empressaProducteRepository.findAll();
+					Periode existeix2 = periodeRepository.findPeriodByNumType(periode.getNumPeriode(), periode.getTipusPeriode());
+					for (EmpressaProducte empressaProducte : listEmpProd) {
+						ProducteEmpressaPeriode toSave = new ProducteEmpressaPeriode();
+						toSave.setNo_comercialitzacio(false);
+						toSave.setPendent(false);
+						toSave.setRegistrat(false);
+						toSave.setTancat(true);
+						toSave.setEmpressaProducte(empressaProducte);
+						toSave.setIdPeriode(existeix2);
+						
+//						empressaProducte.getTipusProducte();
+//						String typeProduct = pduController.getProductsType(empressaProducte.getTipusProducte());
+//						String typePeriod = new String();
+//						
+//						if(typeProduct.equals("PI")) {
+//							typePeriod = "S";
+//						}else if (typeProduct.equals("LL")) {
+//							typePeriod = "Q";
+//						}
+//						List<Periode> periodes = periodeRepository.getDatesByProductAndDate(typePeriod,gestioEmpressaController.getDataActualPerQuery());
+//						for (Periode periode2 : periodes) {
+//							ProducteEmpressaPeriode regFinal = new ProducteEmpressaPeriode();
+//							regFinal.setEmpressaProducte(toSave.getEmpressaProducte());
+//							regFinal.setNo_comercialitzacio(toSave.getNoComercialitzacio());
+//							regFinal.setPendent(toSave.getPendent());
+//							regFinal.setRegistrat(toSave.getRegistrat());
+//							regFinal.setTancat(toSave.getTancat());
+//							regFinal.setIdPeriode(periode2);
+//							
+//						}
+						
+					}
+
+					
+					
+					
 				}else {
 					//El nou periode introduït te el mateix numero i tipus de periode que un periode existent
 					periodesErrors.add(periode);
@@ -88,8 +140,8 @@ public class GestioPeriodeController {
     	registresTotals = registresTotals.stream()
     			  .filter(x -> periode == null || x.getNumPeriode().equals(Character.getNumericValue(periode.charAt(0))))
     			  .filter(x -> periode == null || x.getTipusPeriode().equals(String.valueOf(periode.charAt(1))))
-    			  .filter(x -> dataInici == null || x.getDataInici().before(dataInici))
-    			  .filter(x -> dataFi == null || x.getDataFi().after(dataFi))
+    			  .filter(x -> dataInici == null || x.getDataInici().after(dataInici) || x.getDataFi().equals(dataInici))
+    			  .filter(x -> dataFi == null || x.getDataFi().before(dataFi) || x.getDataFi().equals(dataFi))
 	              .collect(Collectors.toList());
     	
 	 return registresTotals;
