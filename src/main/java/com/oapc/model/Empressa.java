@@ -26,13 +26,17 @@ public class Empressa {
 	
 //	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "periode")
 //	private Set<ProducteEmpressaPeriode> producteEmpressaPeriode = new HashSet();
-	@JsonManagedReference
-	@OneToMany(mappedBy = "empressa")
-	private Set<Register> register = new HashSet();
+//	@JsonManagedReference
+//	@OneToMany(mappedBy = "empressa")
+//	private Set<Register> register = new HashSet();
 	
 //	@JsonManagedReference
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "empressa")
 	private Set<ErrorRegister> errorRegister = new HashSet();
+	
+	@JsonManagedReference
+	@OneToMany(mappedBy = "empresa")
+	private Set<User> user = new HashSet();
 	
 	public Empressa() {
 		
@@ -77,13 +81,14 @@ public class Empressa {
 	}
 	
 	@JsonIgnore
-	public Set<Register> getRegisters() {
-		return register;
+	public Set<User> getUser() {
+		return user;
 	}
 
-	public void setRegisters(Set<Register> register) {
-		this.register = register;
+	public void setUser(Set<User> user) {
+		this.user = user;
 	}
+	
 	
 	@JsonIgnore
 	public Set<ErrorRegister> getErrorRegister() {

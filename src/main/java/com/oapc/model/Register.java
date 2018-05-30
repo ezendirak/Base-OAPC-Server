@@ -45,10 +45,15 @@ public class Register {
     private Float preuSortida;
     
     
+//    @JsonBackReference
+//    @ManyToOne
+//	@JoinColumn(name="empresaInformant", nullable = false)
+//    private Empressa empressa;
+    
     @JsonBackReference
     @ManyToOne
-	@JoinColumn(name="empresaInformant", nullable = false)
-    private Empressa empressa;
+	@JoinColumn(name="usuariInformant", nullable = false)
+    private User user;
     
     public Register() {}
     
@@ -124,14 +129,14 @@ public class Register {
 	public void setQuantitatVenuda(Long quantitatVenuda) {
 		this.quantitatVenuda = quantitatVenuda;
 	}
-
+	
 	@JsonIgnore
-	public Empressa getEmpressa() {
-		return empressa;
+	public User getUser() {
+		return user;
 	}
 
-	public void setEmpressa(Empressa empressa) {
-		this.empressa = empressa;
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 	@JsonIgnore

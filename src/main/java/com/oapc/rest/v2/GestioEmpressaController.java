@@ -74,7 +74,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/allEmpresses")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public List<String> getEmpressesName(){
     	
     	List<Empressa> empressesList = empressaRepository.findAll();
@@ -89,7 +89,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/empresesByProd/{producte}")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public List<String> getEmpressesByProducte(@PathVariable(value = "producte", required=false) String producte){
     	
     	List<Empressa> empressesList = empressaRepository.getEmpresesByProd(producte);
@@ -101,8 +101,19 @@ public class GestioEmpressaController {
     }
     
     @Transactional(readOnly = true)
+    @GetMapping("/empresesByUserId/{id}")
+//    @PreAuthorize("hasRole('USER')")
+    public Empressa getEmpressesByUserId(@PathVariable(value = "id", required=false) Integer idUser){
+    	
+    	Empressa empCodi = empressaRepository.getCodiEmpByUserId(Long.valueOf(idUser));
+    	
+    	
+    	return empCodi;
+    }
+    
+    @Transactional(readOnly = true)
     @GetMapping("/productesModal")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public List<InfoRegistres> getProductsName2(){
     	String vacio = "";
     	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
@@ -121,7 +132,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/nomProductesModal")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public List<String> getProductsName3(){
     	String vacio = "";
     	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
@@ -148,7 +159,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = false)
 	@PostMapping("/newEmp")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
 	public void newEmpressa(@Valid @RequestBody InfoEmpressa2 newEmpressa) {
 	
 		Empressa existeix = empressaRepository.findByCodi(newEmpressa.getCodi());
@@ -222,7 +233,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = false)
     @PutMapping("/gestioEmpressa")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Empressa> updateEmpressa(@Valid @RequestBody InfoEmpressa2 empresa) {
 
     	Empressa emp = empressaRepository.findOne(empresa.getId());
@@ -285,16 +296,13 @@ public class GestioEmpressaController {
 				regFinal.setIdPeriode(periode);
 				producteEmpressaPeriodeRepository.save(regFinal);
 			}
-			
 		}
-
-        
         return ResponseEntity.ok(updatedEmpressa);
     }
     
     @Transactional(readOnly = false)
     @PutMapping("/gestioPeriode")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ProducteEmpressaPeriode> updatePeriodeProdEmp(@Valid @RequestBody List<String> productes) {
     	List<ProducteEmpressaPeriode> registres = producteEmpressaPeriodeRepository.findAllListByProd(productes);
     	for (ProducteEmpressaPeriode producteEmpressaPeriode : registres) {
@@ -311,7 +319,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = false)
     @PutMapping("/deleteEmpresa")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ProducteEmpressaPeriode> deleteEmp(@Valid @RequestBody InfoEmpressa empresa) {
     	Empressa emp = empressaRepository.findById(empresa.getId());
     	if (emp != null) {
@@ -322,7 +330,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = false)
     @PutMapping("/gestioPep")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ProducteEmpressaPeriode> updatePep(@Valid @RequestBody PepDTO objPep) {
     	ProducteEmpressaPeriode pepToUpdate = producteEmpressaPeriodeRepository.findOne(objPep.getId());
     	if (pepToUpdate != null) {
@@ -339,7 +347,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = false)
     @PutMapping("/regNoComPer")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Empressa> updateRegNoComPer(@Valid @RequestBody RegistreNoComPerDTO registre) {
 
 //    	Empressa emp = empressaRepository.findByCodi(registre.getEmpresa());
@@ -356,7 +364,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/empressesFiltrat")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getRegistresFiltratsPaginats(@RequestParam(value="page",     defaultValue="0") String spage,
     		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value = "estat", required=false) String estat, @RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value = "codiEmpressa", required=false) String codiEmpressa)	    		    		    	
     {    	
@@ -406,7 +414,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/empresses_countFiltrat")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public Long getRegisterCountFiltrat(@RequestParam(value = "estat", required=false) String estat, @RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value = "codiEmpressa", required=false) String codiEmpressa)	    		    		    	
     {    
     	
@@ -435,7 +443,7 @@ public class GestioEmpressaController {
     
     @Transactional(readOnly = true)
     @GetMapping("/registresPEPFiltrat")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getRegistresPEPFiltratsPaginats(@RequestParam(value="page",     defaultValue="0") String spage,
     		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value = "periode", required=false) String periode, 
     		@RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value="empresa", required=false) String empresa, 
@@ -493,7 +501,7 @@ public class GestioEmpressaController {
 //    
     @Transactional(readOnly = true)
     @GetMapping("/registresPEP_count")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public Long getRegisterPEPCountFiltrat(@RequestParam(value = "periode", required=false) String periode, @RequestParam(value="tipusProducte", required=false) String tipusProducte, 
     		@RequestParam(value="empressa", required=false) String empressa, @RequestParam(value="estat", required=false) String estat)	    		    		    	
     {    

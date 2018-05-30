@@ -1,54 +1,40 @@
-INSERT INTO `test-oapc`.rols (rol) VALUES 
-('Informant')
-,('Gestor')
-,('Administrador')
-;
+INSERT INTO USERS (id, username, password, first_name, last_name, email, phone_number, enabled, last_password_reset_date) VALUES (1, 'user ABC', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'USUARIO', 'NORMAL', 'user@example.com', '+1234567890', true, '2017-10-01 21:58:58'),(2, 'admin', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'USUARIO', 'ADMIN', 'admin@example.com', '+0987654321', true, '2017-10-01 18:57:58'),(3, 'gestor', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'USUARIO', 'GESTOR', 'gestor@example.com', '+0987654321', true, '2017-10-01 18:57:58');
 
-INSERT INTO USERS (id, username, password, first_name, last_name, email, phone_number, enabled, last_password_reset_date, rol_id) VALUES 
-(1, 'user', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'USUARIO', 'NORMAL', 'user@example.com', '+1234567890', true, '2017-10-01 21:58:58', 1)
-,(2, 'admin', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'USUARIO', 'ADMIN', 'admin@example.com', '+0987654321', true, '2017-10-01 18:57:58', 3);
+INSERT INTO AUTHORITY (id, name) VALUES (1, 'ROLE_USER'), (2, 'ROLE_ADMIN'), (3, 'ROLE_GESTOR');
 
-INSERT INTO AUTHORITY (id, name) VALUES (1, 'ROLE_USER');
-INSERT INTO AUTHORITY (id, name) VALUES (2, 'ROLE_ADMIN');
+INSERT INTO USER_AUTHORITY (user_id, authority_id) VALUES (1, 1),(2, 1),(2, 2),(2,3),(3,1),(3,3);
 
-INSERT INTO USER_AUTHORITY (user_id, authority_id) VALUES 
-(1, 1)
-,(2, 1)
-,(2, 2)
-;
-
-INSERT INTO `test-oapc`.pdu (clave,cont,datos,tabla) VALUES 
-('PA',1,'Productes Agraris','FAMILIA')
-,('PAG',1,'Produces Agricoles','SUBFAMILIA')
-,('FR',1,'Fruita','GRUP')
-,('PI',1,'Pinyol','SUBGRUP')
-,('PR01',1,'Pressec                  PAPAGFRPI','PRODUCTE')
-,('PR01BL',1,'Blanca','COLORCARN')
-,('PR01GR',1,'Groga','COLORCARN')
-,('PR0101',1,'I','QUALITAT')
-,('PR0102',1,'II','QUALITAT')
-,('PR0103',1,'Industria','QUALITAT')
-,('PR0101',1,'AAAA (> 90 mm)','CALIBRE')
-,('PR0102',1,'AAA (80-90 mm)','CALIBRE')
-,('PR0103',1,'AA (73-80 mm)','CALIBRE')
-,('PR0104',1,'A (67-73 mm)','CALIBRE')
-,('PR0105',1,'B (61-67 mm)','CALIBRE')
-,('PR0106',1,'C (56-61 mm)','CALIBRE')
-,('PR0107',1,'D (51-56 mm)','CALIBRE')
-,('PA01',1,'Pavia                    PAPAGFRPI','PRODUCTE')
-,('PA01GR',1,'Groga','COLORCARN')
-,('PA0101',1,'I','QUALITAT')
-,('PA0102',1,'II','QUALITAT')
-,('PA0103',1,'Industria','QUALITAT')
-,('PA0101',1,'AAAA (> 90 mm)','CALIBRE')
-,('PA0102',1,'AAA (80-90 mm)','CALIBRE')
-,('PA0103',1,'AA (73-80 mm)','CALIBRE')
-,('PA0104',1,'A (67-73 mm)','CALIBRE')
-,('PA0105',1,'B (61-67 mm)','CALIBRE')
-,('PA0106',1,'C (56-61 mm)','CALIBRE')
-,('PA0107',1,'D (51-56 mm)','CALIBRE')
-,('LL',1,'Llavor','SUBGRUP')
-,('PO01',1,'Poma                     PAPAGFRLL','PRODUCTE')
+INSERT INTO pdu (clave,cont,datos,tabla) values ('PA',1,'Productes Agraris','FAMILIA'),
+('PAG',1,'Produces Agricoles','SUBFAMILIA'),
+('FR',1,'Fruita','GRUP'),
+('PI',1,'Pinyol','SUBGRUP'),
+('PR01',1,'Pressec                  PAPAGFRPI','PRODUCTE'),
+('PR01BL',1,'Blanca','COLORCARN'),
+('PR01GR',1,'Groga','COLORCARN'),
+('PR0101',1,'I','QUALITAT'),
+('PR0102',1,'II','QUALITAT'),
+('PR0103',1,'Industria','QUALITAT'),
+('PR0101',1,'AAAA (> 90 mm)','CALIBRE'),
+('PR0102',1,'AAA (80-90 mm)','CALIBRE'),
+('PR0103',1,'AA (73-80 mm)','CALIBRE'),
+('PR0104',1,'A (67-73 mm)','CALIBRE'),
+('PR0105',1,'B (61-67 mm)','CALIBRE'),
+('PR0106',1,'C (56-61 mm)','CALIBRE'),
+('PR0107',1,'D (51-56 mm)','CALIBRE'),
+('PA01',1,'Pavia                    PAPAGFRPI','PRODUCTE'),
+('PA01GR',1,'Groga','COLORCARN'),
+('PA0101',1,'I','QUALITAT'),
+('PA0102',1,'II','QUALITAT'),
+('PA0103',1,'Industria','QUALITAT'),
+('PA0101',1,'AAAA (> 90 mm)','CALIBRE'),
+('PA0102',1,'AAA (80-90 mm)','CALIBRE'),
+('PA0103',1,'AA (73-80 mm)','CALIBRE'),
+('PA0104',1,'A (67-73 mm)','CALIBRE'),
+('PA0105',1,'B (61-67 mm)','CALIBRE'),
+('PA0106',1,'C (56-61 mm)','CALIBRE'),
+('PA0107',1,'D (51-56 mm)','CALIBRE'),
+('LL',1,'Llavor','SUBGRUP'),
+('PO01',1,'Poma                     PAPAGFRLL','PRODUCTE')
 ,('PO0101',1,'I','QUALITAT')
 ,('PO0102',1,'II','QUALITAT')
 ,('PO0103',1,'Industria','QUALITAT')
@@ -124,41 +110,11 @@ INSERT INTO `test-oapc`.pdu (clave,cont,datos,tabla) VALUES
 ,('PE0115',1,'45-50 mm','CALIBRE')
 ;
 
-INSERT INTO `test-oapc`.empressa (codi,estat) VALUES 
-('ABCDEF',1)
-,('GHIJKL',1)
-,('MNOPQR',0)
-;
+INSERT INTO empressa (codi,estat) VALUES ('ABCDEF',1),
+('GHIJKL',1),
+('MNOPQR',0);
 
-INSERT INTO `test-oapc`.empressa_producte (tipus_producte,empressa_id) VALUES 
-('Pressec',1)
-,('Pavia',1)
-,('Poma',2)
-,('Pressec',2)
-;
-
-INSERT INTO `test-oapc`.producte_empressa_periode (data_ultim_registre,no_comercialitzacio,pendent,registrat,tancat,empressa_product_id,periode_id) VALUES 
-(NULL,0,0,0,1,1,1)
-,(NULL,0,0,0,1,2,1)
-,(NULL,0,0,0,1,3,1)
-,(NULL,0,0,0,1,4,1)
-,(NULL,0,0,0,1,1,2)
-,(NULL,0,0,0,1,2,2)
-,(NULL,0,0,0,1,3,2)
-,(NULL,0,0,0,1,4,2)
-;
-
-INSERT INTO `test-oapc`.register (color_carn,id_periode,tipus_producte,varietat,calibre,empresa_informant,preu_sortida,qualitat,quantitat_venuda) VALUES 
-('','1','Poma','Gala','80 i + mm',2,5,'I',2)
-,('Blanca','2','Pressec','','AAAA (> 90 mm)',1,3,'Industria',12)
-,('Groga','2','Pavia','','AAA (80-90 mm)',1,4,'II',49)
-,('','1','Poma','Golden Delicious','75-80 mm',2,2.6,'I',26)
-,('Blanca','1','Pressec',NULL,'D (51-56 mm)',1,0.56,'I',34)
-,('Blanca','1','Pressec',NULL,'D (51-56 mm)',1,0.56,'I',34)
-,(NULL,'3','Poma','Gala','75-80 mm',2,0.25,'I',22)
-,(NULL,'3','Poma','Fuji','80 i + mm',2,0.6,'II',78)
-,('Blanca','1','Pressec',NULL,'D (51-56 mm)',1,0.56,'I',34)
-,('Blanca','1','Pressec',NULL,'D (51-56 mm)',1,0.56,'I',34)
-;
-
-
+INSERT INTO empressa_producte (tipus_producte,empressa_id) VALUES ('Pressec',1),
+('Pavia',1),
+('Poma',2),
+('Pressec',2);

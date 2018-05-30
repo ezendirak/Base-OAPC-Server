@@ -34,5 +34,6 @@ public interface ProducteEmpressaPeriodeRepository extends JpaRepository<Product
 	@Query("select x from ProducteEmpressaPeriode x where x.periode = :periode AND x.empressaProducte = (select id from EmpressaProducte d where d.tipusProducte = :producte AND d.empressa = (select id from Empressa where codi = :codiProd))")
 	ProducteEmpressaPeriode findByPerProdAndCodiEmp(@Param("periode") Periode periode, @Param("producte") String producte, @Param("codiProd") String codiProd);
 	
-//	@Query("select x from ProducteEmpressaPeriode x where ")
+	@Query("select x from ProducteEmpressaPeriode x where x.periode =:periode AND empressaProducte = :empressaProducte")
+	ProducteEmpressaPeriode findByPeriodAndEmpProd(@Param("periode") Periode periode, @Param("empressaProducte") EmpressaProducte empressaProducte);
 }

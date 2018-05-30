@@ -29,66 +29,50 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Entity
-@Table(name="USERS")
-public class User implements UserDetails {
+
+public abstract class UserDTO implements UserDetails {
 
 	private static final long serialVersionUID = -5015027675142974514L;
 
-	@Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	
     private Long id;
 
-    @Column(name = "username")
     private String username;
 
-    @JsonIgnore
-    @Column(name = "password")
     private String password;
 
-    @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "email")
     private String email;
 
-    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "enabled")
     private boolean enabled;
 
-    @Column(name = "last_password_reset_date")
     private Timestamp lastPasswordResetDate;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_authority",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
     private Set<Authority> authorities;
 
     
-    @JsonManagedReference
-	@OneToMany(mappedBy = "user")
-	private Set<Register> register = new HashSet();
+//    @JsonManagedReference
+//	@OneToMany(mappedBy = "user")
+//	private Set<Register> register = new HashSet();
    
-    @JsonBackReference
-    @ManyToOne
-	@JoinColumn(name="empresa", nullable = false)
-    private Empressa empresa;
+//    @JsonBackReference
+//    @ManyToOne
+//	@JoinColumn(name="empresa", nullable = false)
+    private String empresa;
     
-    @JsonIgnore
-	public Set<Register> getRegister() {
-		return register;
-	}
-
-	public void setRegister(Set<Register> register) {
-		this.register = register;
-	}
+//    @JsonIgnore
+//	public Set<Register> getRegister() {
+//		return register;
+//	}
+//
+//	public void setRegister(Set<Register> register) {
+//		this.register = register;
+//	}
 	
     public Long getId() {
         return id;
@@ -98,11 +82,11 @@ public class User implements UserDetails {
         this.id = id;
     }
     
-    public Empressa getEmpresa() {
+    public String getEmpresa() {
         return empresa;
     }
 
-    public void setEmpresa(Empressa empresa) {
+    public void setEmpresa(String empresa) {
         this.empresa = empresa;
     }
 
@@ -153,7 +137,7 @@ public class User implements UserDetails {
 //    }
 
     @Override
-    public Set<Authority> getAuthorities() {
+    public Set<? extends GrantedAuthority> getAuthorities() {
         return this.authorities;
     }
 
@@ -190,22 +174,6 @@ public class User implements UserDetails {
         this.lastPasswordResetDate = lastPasswordResetDate;
     }
 
-    @JsonIgnore
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @JsonIgnore
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @JsonIgnore
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+   
 
 }

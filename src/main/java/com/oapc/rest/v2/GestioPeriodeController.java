@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.oapc.model.EmpressaProducte;
 import com.oapc.model.ErrorRest;
+import com.oapc.model.PDU;
 import com.oapc.model.Periode;
 import com.oapc.model.PeriodeDTO;
 import com.oapc.model.ProducteEmpressaPeriode;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RestController
@@ -68,7 +70,7 @@ public class GestioPeriodeController {
    
     @Transactional(readOnly = false)
 	@PostMapping("/newPeriodes")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
 	public void newCalendar(@Valid @RequestBody List<PeriodeDTO> periodesNous) {
     	List<PeriodeDTO> periodesErrors = new ArrayList<PeriodeDTO>();
 		for (PeriodeDTO periode : periodesNous) {
@@ -87,48 +89,30 @@ public class GestioPeriodeController {
 					
 					List<EmpressaProducte> listEmpProd = empressaProducteRepository.findAll();
 					Periode existeix2 = periodeRepository.findPeriodByNumType(periode.getNumPeriode(), periode.getTipusPeriode());
+					
 					for (EmpressaProducte empressaProducte : listEmpProd) {
-						ProducteEmpressaPeriode toSave = new ProducteEmpressaPeriode();
-						toSave.setNo_comercialitzacio(false);
-						toSave.setPendent(false);
-						toSave.setRegistrat(false);
-						toSave.setTancat(true);
-						toSave.setEmpressaProducte(empressaProducte);
-						toSave.setIdPeriode(existeix2);
-						
-//						empressaProducte.getTipusProducte();
-//						String typeProduct = pduController.getProductsType(empressaProducte.getTipusProducte());
-//						String typePeriod = new String();
-//						
-//						if(typeProduct.equals("PI")) {
-//							typePeriod = "S";
-//						}else if (typeProduct.equals("LL")) {
-//							typePeriod = "Q";
-//						}
-//						List<Periode> periodes = periodeRepository.getDatesByProductAndDate(typePeriod,gestioEmpressaController.getDataActualPerQuery());
-//						for (Periode periode2 : periodes) {
-//							ProducteEmpressaPeriode regFinal = new ProducteEmpressaPeriode();
-//							regFinal.setEmpressaProducte(toSave.getEmpressaProducte());
-//							regFinal.setNo_comercialitzacio(toSave.getNoComercialitzacio());
-//							regFinal.setPendent(toSave.getPendent());
-//							regFinal.setRegistrat(toSave.getRegistrat());
-//							regFinal.setTancat(toSave.getTancat());
-//							regFinal.setIdPeriode(periode2);
-//							
-//						}
-						
+						Stream<PDU> producte = pduRepository.getProducteByDades("PRODUCTE", empressaProducte.getTipusProducte());
+						PDU prodObj = producte.collect(Collectors.toList()).get(0);
+						String tipusProd = prodObj.getDatos().substring(32, 34).trim();
+						//registre.getDatos().substring(32, 34).trim()
+						if ((tipusProd.equals("PI") && existeix2.getTipusPeriode().equals("S")) || (tipusProd.equals("LL") && existeix2.getTipusPeriode().equals("Q"))) {
+							ProducteEmpressaPeriode toSave = new ProducteEmpressaPeriode();
+							toSave.setNo_comercialitzacio(false);
+							toSave.setPendent(false);
+							toSave.setRegistrat(false);
+							toSave.setTancat(true);
+							toSave.setEmpressaProducte(empressaProducte);
+							toSave.setIdPeriode(existeix2);
+							
+							producteEmpressaPeriodeRepository.save(toSave);
+						}
 					}
-
-					
-					
-					
 				}else {
 					//El nou periode introduït te el mateix numero i tipus de periode que un periode existent
 					periodesErrors.add(periode);
 					//TODO enrregistrar els errors  (log o per pantalla)
 				}
 			}
-			
 		}
 		logger.info("Registres totals: "+ periodesNous.size() + ". Errors: (periodes repetits) " + periodesErrors.size());
 		
@@ -165,7 +149,7 @@ public class GestioPeriodeController {
     
     @Transactional(readOnly = true)
     @GetMapping("/periodesFiltrat")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getRegistresFiltratsPaginats(@RequestParam(value="page",     defaultValue="0") String spage,
     		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value="periode", required=false) String periode,
     		@RequestParam(value="dataInici", required=false) Date dataInici, @RequestParam(value="dataFi", required=false) Date dataFi) throws ParseException	    		    		    	
@@ -217,7 +201,7 @@ public class GestioPeriodeController {
     
     @Transactional(readOnly = true)
     @GetMapping("/periodes_countFiltrat")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public Long getRegisterCountFiltrat(@RequestParam(value="periode", required=false) String periode,
     		@RequestParam(value="dataInici", required=false) Date dataInici, @RequestParam(value="dataFi", required=false) Date dataFi) throws ParseException	    		    		    	
     {    

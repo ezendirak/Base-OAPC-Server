@@ -67,7 +67,7 @@ public class GestioProdController {
     
     @Transactional(readOnly = true)
     @GetMapping("/atributsProd")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public List<InfoGestioProd> getAllAtributsFromProds()	    		    		    	
     {    
     	List<InfoGestioProd> regiToGestioProd = new ArrayList<InfoGestioProd>();
@@ -117,7 +117,7 @@ public class GestioProdController {
     
     
     @PutMapping("/gestioProducte")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<PDU> updateRegister(@Valid @RequestBody InfoGestioProd registerDetails) {
     	
 //    	Register registre = registreRepository.findOne(registerDetails.getId());
@@ -194,7 +194,7 @@ public class GestioProdController {
     
     @Transactional(readOnly = true)
     @GetMapping("/atributsProdFiltrat")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getRegistresFiltratsPaginats(@RequestParam(value="page",     defaultValue="0") String spage,
     		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value = "familia", required=false) String familia, @RequestParam(value="tipusProducte", required=false) String tipusProducte)	    		    		    	
     {    	    	 
@@ -231,7 +231,7 @@ public class GestioProdController {
     
     @Transactional(readOnly = true)
     @GetMapping("/atributsProd_countFiltrat")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public Long getRegisterCountFiltrat(@RequestParam(value="tipusProducte", required=false) String tipusProducte, @RequestParam(value="familia", required=false) String familia)	    		    		    	
     {    
     	

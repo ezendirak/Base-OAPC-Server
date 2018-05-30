@@ -1,19 +1,26 @@
 package com.oapc.rest.v2;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.oapc.model.Empressa;
+import com.oapc.model.EmpressaProducte;
 import com.oapc.model.ErrorRest;
 import com.oapc.model.Periode;
 import com.oapc.model.PeriodeDTO;
+import com.oapc.model.ProducteEmpressaPeriode;
 import com.oapc.model.Register;
 import com.oapc.model.RegisterDTO;
 import com.oapc.model.RegisterExcelDTO;
+import com.oapc.model.User;
+import com.oapc.repo.EmpressaProducteRepository;
 import com.oapc.repo.EmpressaRepository;
 import com.oapc.repo.PduRepository;
 import com.oapc.repo.PeriodeRepository;
+import com.oapc.repo.ProducteEmpressaPeriodeRepository;
 import com.oapc.repo.RegisterRepository;
+import com.oapc.repo.UserRepository;
 import com.oapc.rest.v2.PduController;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +36,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -60,6 +68,18 @@ public class RegisterController {
     
     @Autowired
     EmpressaRepository empressaRepository;
+    
+    @Autowired
+    UserRepository userRepository;
+    
+    @Autowired
+    ProducteEmpressaPeriodeRepository producteEmpressaPeriodeRepository;
+    
+    @Autowired
+    EmpressaProducteRepository empressaProducteRepository;
+    
+    @Autowired
+    GestioEmpressaController gestioEmpressaController;
 
 //    private String[] taules = {"FAMILIA", "PRODUCTE", "SUBFAMILIA", "GRUP", "SUBGRUP", "COLORCARN", "QUALITAT", "CALIBRE"};
     
@@ -67,7 +87,7 @@ public class RegisterController {
     
     @Transactional(readOnly = true)
     @GetMapping("/registres_page")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getAllRegistrePage(
     		@RequestParam(value="page",     defaultValue="0") String spage,
     		@RequestParam(value="per_page", defaultValue="0") String sper_page
@@ -106,7 +126,7 @@ public class RegisterController {
     
     @Transactional(readOnly = true)
     @GetMapping("/registres_count")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public Long getRegisterCount()	    		    		    	
     {    	    	 
     	 Stream<Register> stream_cont = registreRepository.findAllStream();    	 	     
@@ -115,7 +135,7 @@ public class RegisterController {
 
     
     @GetMapping("/registres/{id}")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<RegisterDTO> getRegistreById(@PathVariable(value = "id") Long regisId) {
     	Register note = registreRepository.findOne(regisId);
         if(note == null) {
@@ -144,13 +164,11 @@ public class RegisterController {
     
 //    private String[] combos = {"COLORCARN", "VARIETAT", "QUALITAT", "CALIBRE"};
     @PostMapping("/registres")
-    @PreAuthorize("hasRole('GESTOR')")
-    public Register createRegister(@Valid @RequestBody RegisterDTO registre) {
+    @PreAuthorize("hasRole('USER')")
+    public void createRegister(@Valid @RequestBody RegisterDTO registre) {
     	Periode peri = periodeRepository.findOne(Long.valueOf(registre.getPeriode().getId()));
-    	Empressa emp = empressaRepository.findOne(2L);
-//    	Empressa emp2 = empressaRepository.findById(1L);
-//    	long prova = registre.getPeriode();
-//    	logger.info(String.valueOf(prova));
+    	User usuariRegistrador = userRepository.findByUsername(registre.getUsuName());
+
     	Register regi = new Register();
     	regi.setCalibre(registre.getCalibre());
     	regi.setColorCarn(registre.getColorCarn());
@@ -160,12 +178,22 @@ public class RegisterController {
     	regi.setQuantitatVenuda(registre.getQuantitatVenuda());
     	regi.setTipusProducte(registre.getTipusProducte());
     	regi.setPeriode(peri);
-    	regi.setEmpressa(emp);
-        return registreRepository.save(regi);
+    	regi.setUser(usuariRegistrador);
+//    	regi.setEmpressa(emp);
+        registreRepository.save(regi);
+        
+        //Comprovem data ultim registre (ProdEmpPer)
+
+        ProducteEmpressaPeriode test = producteEmpressaPeriodeRepository.findByPeriodAndEmpProd(peri, empressaProducteRepository.findAllListByProdAndEmpId(registre.getTipusProducte(), usuariRegistrador.getEmpresa()));
+        test.setDataUltimRegistre(new Timestamp(DateTime.now().getMillis()));
+        if (test.getPendent()){test.setPendent(false); test.setRegistrat(true);}
+        producteEmpressaPeriodeRepository.save(test);
+        
     }
     
+
     @PostMapping("/fromExcelRegistres/{familia}")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public Register createRegisterFromExcel(@PathVariable(value = "familia") Long familia, @Valid @RequestBody RegisterExcelDTO registre) {
     	
     	if(!pduController.existeEn("PRODUCTE", registre.getTipusProducte())) {
@@ -208,7 +236,7 @@ public class RegisterController {
         	regi.setQuantitatVenuda(registre.getQuantitatVenuda());
         	regi.setTipusProducte(registre.getTipusProducte());
         	regi.setPeriode(peri);
-        	regi.setEmpressa(emp);
+//        	regi.setEmpressa(emp);
         	return registreRepository.save(regi);
     	}
     	//QUE FEM EN AQUEST CAS
@@ -216,7 +244,7 @@ public class RegisterController {
     }
     
     @PostMapping("/downloadToExcel")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public void crearExcelFromDataTable(@RequestBody List<RegisterDTO> frmData) throws IOException
     {
     	if (frmData != null) {
@@ -262,7 +290,7 @@ public class RegisterController {
     }
     
     @PutMapping("/registres")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Register> updateRegister(@Valid @RequestBody RegisterDTO registerDetails) {
     	
     	Register registre = registreRepository.findOne(registerDetails.getId());
@@ -301,7 +329,7 @@ public class RegisterController {
     }
     
     @DeleteMapping("/registres/{id}")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Register> deleteRegistre(@PathVariable(value = "id") Long registreId) {
     	Register registre = registreRepository.findOne(registreId);
         if(registre == null) {
@@ -314,7 +342,7 @@ public class RegisterController {
 
     
     @GetMapping("/registres")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public List<Register> getAllRegisters() {
     	List<Register> test = registreRepository.findAll();
     	return test;        
@@ -323,7 +351,7 @@ public class RegisterController {
     
     @Transactional(readOnly = true)
     @GetMapping("/registresFiltrat")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getRegistresFiltratsPaginats(@RequestParam(value="page",     defaultValue="0") String spage,
     		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, 
     		@RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat, 
@@ -389,7 +417,7 @@ public class RegisterController {
     
     @Transactional(readOnly = true)
     @GetMapping("/registres_countFiltrat")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public Long getRegisterCountFiltrat(@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, 
     		@RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat, 
     		@RequestParam(value="periode", required=false) String periode, @RequestParam(value="qVenuda", required=false) String qVenuda, @RequestParam(value="qVenuda2", required=false) String qVenuda2, 
@@ -417,7 +445,7 @@ public class RegisterController {
 	              .filter(x -> qVenuda2 == null		 	|| 	x.getQuantitatVenuda() < Long.valueOf(qVenuda2))
 	              .filter(x -> pSortida == null		 	|| 	x.getPreuSortida() > Long.valueOf(pSortida))
 	              .filter(x -> pSortida2 == null		|| 	x.getPreuSortida() < Long.valueOf(pSortida2))
-	              .filter(x -> eInformant == null		||	x.getEmpressa().equals(empressa))
+//	              .filter(x -> eInformant == null		||	x.getEmpressa().equals(empressa))
 	              .collect(Collectors.toList());
     	
     	if (periode != null) {
@@ -435,7 +463,7 @@ public class RegisterController {
     
     @Transactional(readOnly = true)
     @GetMapping("/periodesTotals")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public List<PeriodeDTO> getPeriodesTotals() throws ParseException{
     	
     	List<Periode> streamPeriode = periodeRepository.findAllList();
@@ -465,7 +493,7 @@ public class RegisterController {
     
     @Transactional(readOnly = true)
     @GetMapping("/periodesDisponibles")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public List<PeriodeDTO> getPeriodesDisponibles() throws ParseException{
     	
     	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponibles();
@@ -490,7 +518,7 @@ public class RegisterController {
     //PERIODES PEL FILTRE DE REGISTRE
     @Transactional(readOnly = true)
     @GetMapping("/periodesByProd/{subGrup}")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public List<PeriodeDTO> getPeriodesByProd(@PathVariable(value = "subGrup", required=false) String subGrup){
     	
 
@@ -522,7 +550,7 @@ public class RegisterController {
     
     @Transactional(readOnly = true)
     @GetMapping("/periByProductes/{productes}")
-    @PreAuthorize("hasRole('GESTOR')")
+    @PreAuthorize("hasRole('USER')")
     public List<PeriodeDTO> getPerByProducte(@PathVariable(value = "productes", required=false) String productes){
     	
 

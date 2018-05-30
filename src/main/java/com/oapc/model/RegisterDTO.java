@@ -34,9 +34,7 @@ public class RegisterDTO {
 //  @Column(name="CONT")
     private Float preuSortida;
     
-    @ManyToOne
-	@JoinColumn(name="empresaInformant", nullable = false)
-    private Empressa empressa;
+    private String usuName;
     
     public RegisterDTO() {}
     
@@ -104,14 +102,6 @@ public class RegisterDTO {
 	public void setQuantitatVenuda(Long quantitatVenuda) {
 		this.quantitatVenuda = quantitatVenuda;
 	}
-
-	public Empressa getEmpressa() {
-		return empressa;
-	}
-
-	public void setEmpressa(Empressa empressa) {
-		this.empressa = empressa;
-	}
 	
 	public Float getPreuSortida() {
 		return preuSortida;
@@ -119,6 +109,14 @@ public class RegisterDTO {
 
 	public void setPreuSortida(Float preuSortida) {
 		this.preuSortida = preuSortida;
+	}
+
+	public String getUsuName() {
+		return usuName;
+	}
+
+	public void setUsuName(String usuName) {
+		this.usuName = usuName;
 	}
 
         
