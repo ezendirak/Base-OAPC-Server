@@ -12,14 +12,17 @@ import com.oapc.model.InfoRegistres;
 import com.oapc.model.PDU;
 import com.oapc.model.PepDTO;
 import com.oapc.model.Periode;
+import com.oapc.model.PeriodeDTO;
 import com.oapc.model.ProducteEmpressaPeriode;
 import com.oapc.model.RegistreNoComPerDTO;
+import com.oapc.model.User;
 import com.oapc.repo.EmpressaProducteRepository;
 import com.oapc.repo.EmpressaRepository;
 import com.oapc.repo.PduRepository;
 import com.oapc.repo.PeriodeRepository;
 import com.oapc.repo.ProducteEmpressaPeriodeRepository;
 import com.oapc.repo.RegisterRepository;
+import com.oapc.repo.UserRepository;
 import com.oapc.rest.v2.PduController;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +72,9 @@ public class GestioEmpressaController {
     
     @Autowired
     ProducteEmpressaPeriodeRepository	producteEmpressaPeriodeRepository;
+    
+    @Autowired
+    UserRepository userRepository;
    
     
     
@@ -81,7 +87,7 @@ public class GestioEmpressaController {
     	List<String> empList = new ArrayList<String>();
     	empList.add("Totes");
     	for (Empressa empressa : empressesList) {
-			empList.add(empressa.getCodi());
+    		if(!empressa.getCodi().equals("Administració")) {empList.add(empressa.getCodi());}
 		}
     	return empList;
     }
@@ -359,6 +365,24 @@ public class GestioEmpressaController {
     	return null;
     }
     
+    
+    @Transactional(readOnly = true)
+    @GetMapping("/usersByCodiEmp/")
+    @PreAuthorize("hasRole('USER')")
+    public List<String> getUsersByCodiEmp(@RequestParam(value = "eInformant", required=false) String eInformant){
+    	List<String> usersList = new ArrayList<String>();
+    	List<User> usersListU = new ArrayList<User>();
+    	if(eInformant != null) {
+    		usersListU = userRepository.findUserByCodiEmp(eInformant);
+    	}else {
+    		usersListU = userRepository.findAllUserRole();
+    	}
+    	for (User user : usersListU) {
+			usersList.add(user.getUsername());
+		}
+    	return usersList;
+    }
+    
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////PAGINATION////////////////////////////////////////////////////
     
@@ -553,9 +577,9 @@ public class GestioEmpressaController {
     	}
     	
     	if (periode != null) {
-    		char numPeriode = periode.charAt(0);//numero de periode
-        	char tipusPeriode = periode.charAt(1);//tipus de periode
-        	Periode periodeToSave = periodeRepository.findPeriodByNumType(Character.getNumericValue(numPeriode), String.valueOf(tipusPeriode));	
+    		String numPeriode = periode.substring(0, periode.length() - 1);//numero de periode
+        	char tipusPeriode = periode.charAt(periode.length() - 1);//tipus de periode
+        	Periode periodeToSave = periodeRepository.findPeriodByNumType(Integer.valueOf(numPeriode), String.valueOf(tipusPeriode));	
         	registresTotals = registresTotals.stream()
         			.filter(x -> periode   == null     || x.getIdPeriode().equals(periodeToSave))
   	              .collect(Collectors.toList());

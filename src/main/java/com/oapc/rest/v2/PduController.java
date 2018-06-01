@@ -4,11 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.oapc.model.AtributsCombo;
+import com.oapc.model.EmpressaProducte;
 import com.oapc.model.ErrorRest;
 import com.oapc.model.InfoRegistres;
 import com.oapc.model.NewProdDTO;
 import com.oapc.model.PDU;
+import com.oapc.model.User;
+import com.oapc.repo.EmpressaProducteRepository;
 import com.oapc.repo.PduRepository;
+import com.oapc.repo.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +38,12 @@ public class PduController {
 	
     @Autowired
     PduRepository pduRepository;
+    
+    @Autowired
+    UserRepository userRepository;
+    
+    @Autowired
+    EmpressaProducteRepository empressaProducteRepository;
 
     private String[] taules = {"FAMILIA", "PRODUCTE", "SUBFAMILIA", "GRUP", "SUBGRUP", "COLORCARN", "QUALITAT", "CALIBRE"};
     private String[] combos = {"COLORCARN", "VARIETAT", "QUALITAT", "CALIBRE"};
@@ -253,6 +263,47 @@ public class PduController {
     		producte.setId(registre.getId());
     		productes.add(producte);
 		}
+    	return productes;
+    }
+    
+    @Transactional(readOnly = true)
+    @GetMapping("/pdu/productesModalByUserName/{userName}")
+//    @PreAuthorize("hasRole('USER')")
+    public List<InfoRegistres> getProductsNameForModalByUserName(@PathVariable(value = "userName", required=false) String userName){
+    	String vacio = "";
+    	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
+    	
+    	List<InfoRegistres> productes = new ArrayList<InfoRegistres>();
+    	if(!userName.equals("admin")) {//Si som usuaris d'empresa
+	    	User usuari = userRepository.findByUsername(userName);
+			//Busquem, a partir de l'usuari, per a quina empresa treballa i quins productes controla la seva empresa
+			List<EmpressaProducte> empProdList = empressaProducteRepository.findAllStreamByEmpressa(usuari.getEmpresa());
+			List<String> productesDisponibles = new ArrayList<String>();
+			for (EmpressaProducte empressaProducte : empProdList) {
+				productesDisponibles.add(empressaProducte.getTipusProducte());
+			}
+			//Es crea una llista dels productes de la seva empresa que compararem amb els productes totals
+	    	for (PDU registre : pduStream.collect(Collectors.toList())) {
+	    		//Per cada producte que coincideix, agafem totes les seves dades
+	    		if (productesDisponibles.contains(registre.getDatos().substring(0, 25).trim())) {
+	    			InfoRegistres producte = new InfoRegistres();
+	        		producte.setClau(registre.getClave());
+	        		producte.setNom(registre.getDatos().substring(0, 25).trim());
+	        		producte.setSubGrup(registre.getDatos().substring(32, 34).trim());
+	        		producte.setId(registre.getId());
+	        		productes.add(producte);
+	    		}
+			}
+    	}else {//Si som gestors/admins agafem tots els productes
+    		for (PDU registre : pduStream.collect(Collectors.toList())) {
+	    		InfoRegistres producte = new InfoRegistres();
+	        	producte.setClau(registre.getClave());
+	        	producte.setNom(registre.getDatos().substring(0, 25).trim());
+	        	producte.setSubGrup(registre.getDatos().substring(32, 34).trim());
+	        	producte.setId(registre.getId());
+	        	productes.add(producte);
+			}
+    	}
     	return productes;
     }
     

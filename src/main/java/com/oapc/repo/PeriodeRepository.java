@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.oapc.model.EmpressaProducte;
 import com.oapc.model.Periode;
 
 
@@ -27,13 +28,16 @@ public interface PeriodeRepository extends JpaRepository<Periode, Long> {
 	@Query("select p from Periode p where p.duracio > 0 and p.id IN (select DISTINCT(periode) from ProducteEmpressaPeriode o where o.pendent = true or o.registrat = true)")
 	Stream<Periode> getDatesDisponibles();
 	
+	@Query("select p from Periode p where p.duracio > 0 and p.id IN (select DISTINCT(periode) from ProducteEmpressaPeriode o where (o.empressaProducte IN :idsEmpProd) and (o.pendent = true or o.registrat = true))")
+	Stream<Periode> getDatesDisponiblesByEmp(@Param("idsEmpProd") List<EmpressaProducte> idsEmpProd);
+	
 	@Query("select p from Periode p where p.dataInici >= :formatedDate and tipusPeriode = :tipusProduct order by p.numPeriode")
 	List<Periode> getDatesByProductAndDate(@Param("tipusProduct") String tipusProduct, @Param("formatedDate") Date formatedDate);
 	
 	@Query("select p from Periode p where p.numPeriode = :numPeriode and p.tipusPeriode = :tipusPeriode order by p.numPeriode")
 	Periode findPeriodByNumType(@Param("numPeriode") Integer numPeriode, @Param("tipusPeriode") String tipusPeriode);
 	
-	@Query("select p from Periode p where p.id IN (select periode from ProducteEmpressaPeriode y where y.empressaProducte IN (select id from EmpressaProducte h where h.tipusProducte = :productes))")
-	List<Periode> getPeriodesByProductes(@Param("productes") String productes);
+	@Query("select p from Periode p where p.id IN (select periode from ProducteEmpressaPeriode y where y.empressaProducte IN (select id from EmpressaProducte h where h.tipusProducte = :tipusProd and h.empressa.codi = :empresa))")
+	List<Periode> getPeriodesByProductes(@Param("tipusProd") String tipusProd, @Param("empresa") String empresa);
 	
 }

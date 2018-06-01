@@ -356,12 +356,23 @@ public class RegisterController {
     		@RequestParam(value="per_page", defaultValue="0") String sper_page,@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, 
     		@RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat, 
     		@RequestParam(value="periode", required=false) String periode, @RequestParam(value="qVenuda", required=false) String qVenuda, @RequestParam(value="qVenuda2", required=false) String qVenuda2,
-    		@RequestParam(value="pSortida", required=false) String pSortida, @RequestParam(value="pSortida2", required=false) String pSortida2, @RequestParam(value="eInformant", required=false) String eInformant)	    		    		    	
+    		@RequestParam(value="pSortida", required=false) String pSortida, @RequestParam(value="pSortida2", required=false) String pSortida2, @RequestParam(value="eInformant", required=false) String eInformant,
+    		@RequestParam(value="uInformant", required=false) String uInformant)	    		    		    	
     {    	    	 
 //    	 Stream<Register> registresTotals = registreRepository.findAllStream();
-    	 List<Register> registresTotals = registreRepository.findAll();
+    	List<Register> registresTotals = new ArrayList<Register>();
+    	if (eInformant == null) {
+    		registresTotals = registreRepository.findAll();
+    	}
+    	else {
+    		Empressa emp = empressaRepository.findByCodi(eInformant);
+       	 	registresTotals = registreRepository.findAllByEmp(emp);
+    	}
+    	 
+//    	 Empressa emp = empressaRepository.findByCodi(eInformant);
+//    	 List<Register> registresTotals = registreRepository.findAllByEmp(emp);
     	 List<RegisterDTO> regis = new ArrayList<RegisterDTO>();
-    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals, qVenuda, qVenuda2, pSortida, pSortida2, eInformant);
+    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals, qVenuda, qVenuda2, pSortida, pSortida2, eInformant, uInformant);
     	 
     	 
     	 Integer page      = Integer.parseInt(spage);
@@ -421,18 +432,19 @@ public class RegisterController {
     public Long getRegisterCountFiltrat(@RequestParam(value = "colorCarn", required=false) String colorCarn, @RequestParam(value="tipusProducte", required=false) String tipusProducte, 
     		@RequestParam(value="qualitat", required=false) String qualitat, @RequestParam(value="calibre", required=false) String calibre, @RequestParam(value="varietat", required=false) String varietat, 
     		@RequestParam(value="periode", required=false) String periode, @RequestParam(value="qVenuda", required=false) String qVenuda, @RequestParam(value="qVenuda2", required=false) String qVenuda2, 
-    		@RequestParam(value="pSortida", required=false) String pSortida, @RequestParam(value="pSortida2", required=false) String pSortida2,@RequestParam(value="eInformant", required=false) String eInformant)	    		    		    	
+    		@RequestParam(value="pSortida", required=false) String pSortida, @RequestParam(value="pSortida2", required=false) String pSortida2,@RequestParam(value="eInformant", required=false) String eInformant,
+    		@RequestParam(value="uInformant", required=false) String uInformant)	    		    		    	
     {    
     	
     	 List<Register> registresTotals = registreRepository.findAll();
     	 
-    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals, qVenuda, qVenuda2, pSortida, pSortida2, eInformant);
+    	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals, qVenuda, qVenuda2, pSortida, pSortida2, eInformant, uInformant);
     	
     	 return registresTotals.stream().count();
     }
     
     
-    public List<Register> filtrarAtributs(String tipusProducte, String colorCarn, String qualitat, String calibre, String varietat, String periode, List<Register> registresTotals, String qVenuda, String qVenuda2, String pSortida, String pSortida2, String eInformant){
+    public List<Register> filtrarAtributs(String tipusProducte, String colorCarn, String qualitat, String calibre, String varietat, String periode, List<Register> registresTotals, String qVenuda, String qVenuda2, String pSortida, String pSortida2, String eInformant, String uInformant){
     	
     	Empressa empressa = empressaRepository.findByCodi(eInformant);
     	registresTotals = registresTotals.stream()
@@ -445,13 +457,13 @@ public class RegisterController {
 	              .filter(x -> qVenuda2 == null		 	|| 	x.getQuantitatVenuda() < Long.valueOf(qVenuda2))
 	              .filter(x -> pSortida == null		 	|| 	x.getPreuSortida() > Long.valueOf(pSortida))
 	              .filter(x -> pSortida2 == null		|| 	x.getPreuSortida() < Long.valueOf(pSortida2))
-//	              .filter(x -> eInformant == null		||	x.getEmpressa().equals(empressa))
+	              .filter(x -> uInformant == null		||	x.getUser().getUsername().equals(uInformant))
 	              .collect(Collectors.toList());
     	
     	if (periode != null) {
-    		char numPeriode = periode.charAt(0);//numero de periode
-        	char tipusPeriode = periode.charAt(1);//tipus de periode
-        	Periode periodeToSave = periodeRepository.findPeriodByNumType(Character.getNumericValue(numPeriode), String.valueOf(tipusPeriode));	
+    		String numPeriode = periode.substring(0, periode.length() - 1);//numero de periode
+        	char tipusPeriode = periode.charAt(periode.length() - 1);//tipus de periode
+        	Periode periodeToSave = periodeRepository.findPeriodByNumType(Integer.valueOf(numPeriode), String.valueOf(tipusPeriode));	
         	registresTotals = registresTotals.stream()
         			.filter(x -> periode   == null     || x.getPeriode().equals(periodeToSave))
   	              .collect(Collectors.toList());
@@ -492,24 +504,32 @@ public class RegisterController {
     }
     
     @Transactional(readOnly = true)
-    @GetMapping("/periodesDisponibles")
+    @GetMapping("/periodesDisponibles/{userName}")
     @PreAuthorize("hasRole('USER')")
-    public List<PeriodeDTO> getPeriodesDisponibles() throws ParseException{
+    public List<PeriodeDTO> getPeriodesDisponibles(@PathVariable(value = "userName", required=false) String userName) throws ParseException{
     	
-    	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponibles();
+//    	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponibles();
     	List<PeriodeDTO> periodesList = new ArrayList<PeriodeDTO>();
     	
-    	for (Periode peri : streamPeriode.collect(Collectors.toList())) {
-			PeriodeDTO temp = new PeriodeDTO();
-			temp.setAny(peri.getAny());
-			temp.setData_inici(peri.getDataInici());
-			temp.setDataFi(peri.getDataFi());
-			temp.setDuracio(peri.getDuracio());
-			temp.setId(peri.getId());
-			temp.setNumPeriode(peri.getNumPeriode());
-			temp.setTipusPeriode(peri.getTipusPeriode());
-			periodesList.add(temp);
-		}
+    	User usuari = userRepository.findByUsername(userName);
+    	if (usuari.getEmpresa().getCodi().equals("Administració")) {
+    		//Som administradors i hem de tenir tots els periodes de tots els productes de totes les empreses...
+    	}else {
+    		List<EmpressaProducte> empProdList = empressaProducteRepository.findAllStreamByEmpressa(usuari.getEmpresa());
+        	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponiblesByEmp(empProdList);
+        	for (Periode peri : streamPeriode.collect(Collectors.toList())) {
+    			PeriodeDTO temp = new PeriodeDTO();
+    			temp.setAny(peri.getAny());
+    			temp.setData_inici(peri.getDataInici());
+    			temp.setDataFi(peri.getDataFi());
+    			temp.setDuracio(peri.getDuracio());
+    			temp.setId(peri.getId());
+    			temp.setNumPeriode(peri.getNumPeriode());
+    			temp.setTipusPeriode(peri.getTipusPeriode());
+    			periodesList.add(temp);
+    		}
+    	}
+    	
 //    	return streamPeriode.collect(Collectors.toList());
     	return periodesList;
     }
@@ -549,12 +569,12 @@ public class RegisterController {
 //    @PathVariable(value = "subGrup", required=false) String subGrup
     
     @Transactional(readOnly = true)
-    @GetMapping("/periByProductes/{productes}")
+    @GetMapping("/periByProductes/")
     @PreAuthorize("hasRole('USER')")
-    public List<PeriodeDTO> getPerByProducte(@PathVariable(value = "productes", required=false) String productes){
+    public List<PeriodeDTO> getPerByProducte(@RequestParam(value="tipusProducte", required=false) String tipusProd, @RequestParam(value="empresa", required=false) String empresa){
     	
 
-    	List<Periode> periodesDisponibles = periodeRepository.getPeriodesByProductes(productes);
+    	List<Periode> periodesDisponibles = periodeRepository.getPeriodesByProductes(tipusProd, empresa);
     	
     	
     	List<PeriodeDTO> periodesList = new ArrayList<PeriodeDTO>();

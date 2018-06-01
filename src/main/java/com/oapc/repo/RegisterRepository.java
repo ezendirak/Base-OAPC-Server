@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.oapc.model.Empressa;
 import com.oapc.model.Register;
 
 
@@ -17,5 +18,8 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 	
 	@Query("select p from Register p order by id")
 	Stream<Register> findAllStream();
+	
+	@Query("select p from Register p where p.user.empresa = :empresa")
+	List<Register> findAllByEmp(@Param("empresa") Empressa empresa);
 	
 }
