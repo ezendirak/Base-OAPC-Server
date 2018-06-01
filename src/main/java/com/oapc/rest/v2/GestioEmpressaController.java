@@ -92,6 +92,31 @@ public class GestioEmpressaController {
     	return empList;
     }
     
+    @Transactional(readOnly = true)
+    @GetMapping("/allEmpressesNoTotes")
+    @PreAuthorize("hasRole('USER')")
+    public List<String> getEmpressesNameNoTotes(){
+    	
+    	List<Empressa> empressesList = empressaRepository.findAll();
+    	List<String> empList = new ArrayList<String>();
+    	for (Empressa empressa : empressesList) {
+    		if(!empressa.getCodi().equals("Administració")) {empList.add(empressa.getCodi());}
+		}
+    	return empList;
+    }
+    
+    @Transactional(readOnly = true)
+    @GetMapping("/allEmpressesActivaNoTotes")
+    @PreAuthorize("hasRole('USER')")
+    public List<String> getEmpressesNameActivaNoTotes(){
+    	
+    	List<Empressa> empressesList = empressaRepository.findAll();
+    	List<String> empList = new ArrayList<String>();
+    	for (Empressa empressa : empressesList) {
+    		if(!empressa.getCodi().equals("Administració")) {empList.add(empressa.getCodi());}
+		}
+    	return empList;
+    }
     
     @Transactional(readOnly = true)
     @GetMapping("/empresesByProd/{producte}")

@@ -593,4 +593,30 @@ public class RegisterController {
 //    	return streamPeriode.collect(Collectors.toList());
     	return periodesList;
     }
+    
+    @Transactional(readOnly = true)
+    @GetMapping("/periByProdAndEmp/")
+    @PreAuthorize("hasRole('USER')")
+    public List<PeriodeDTO> getPerByProdAndEmp(@RequestParam(value="tipusProducte", required=false) String tipusProd, @RequestParam(value="empresa", required=false) String empresa){
+    	
+
+    	List<Periode> periodesDisponibles = periodeRepository.getPeriodesDisponiblesByProductes(tipusProd, empresa);
+    	
+    	
+    	List<PeriodeDTO> periodesList = new ArrayList<PeriodeDTO>();
+    	
+    	for (Periode peri : periodesDisponibles) {
+			PeriodeDTO temp = new PeriodeDTO();
+			temp.setAny(peri.getAny());
+			temp.setData_inici(peri.getDataInici());
+			temp.setDataFi(peri.getDataFi());
+			temp.setDuracio(peri.getDuracio());
+			temp.setId(peri.getId());
+			temp.setNumPeriode(peri.getNumPeriode());
+			temp.setTipusPeriode(peri.getTipusPeriode());
+			periodesList.add(temp);
+		}
+//    	return streamPeriode.collect(Collectors.toList());
+    	return periodesList;
+    }
 }

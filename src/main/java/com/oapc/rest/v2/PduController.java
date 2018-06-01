@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.oapc.model.AtributsCombo;
+import com.oapc.model.Empressa;
 import com.oapc.model.EmpressaProducte;
 import com.oapc.model.ErrorRest;
 import com.oapc.model.InfoRegistres;
@@ -11,6 +12,7 @@ import com.oapc.model.NewProdDTO;
 import com.oapc.model.PDU;
 import com.oapc.model.User;
 import com.oapc.repo.EmpressaProducteRepository;
+import com.oapc.repo.EmpressaRepository;
 import com.oapc.repo.PduRepository;
 import com.oapc.repo.UserRepository;
 
@@ -44,6 +46,9 @@ public class PduController {
     
     @Autowired
     EmpressaProducteRepository empressaProducteRepository;
+    
+    @Autowired
+    EmpressaRepository empressaRepository;
 
     private String[] taules = {"FAMILIA", "PRODUCTE", "SUBFAMILIA", "GRUP", "SUBGRUP", "COLORCARN", "QUALITAT", "CALIBRE"};
     private String[] combos = {"COLORCARN", "VARIETAT", "QUALITAT", "CALIBRE"};
@@ -320,6 +325,36 @@ public class PduController {
 //			productes.add(registre.getClave());
     		if ((subGrup.equals("S") && registre.getDatos().substring(32, 34).trim().equals("PI")) ||
     			(subGrup.equals("Q") && registre.getDatos().substring(32, 34).trim().equals("LL"))	) {
+    			InfoRegistres producte = new InfoRegistres();
+        		producte.setClau(registre.getClave());
+        		producte.setNom(registre.getDatos().substring(0, 25).trim());
+        		producte.setSubGrup(registre.getDatos().substring(32, 34).trim());
+        		producte.setId(registre.getId());
+        		productes.add(producte);
+    		}
+    		
+		}
+    	return productes;
+    }
+    
+    
+    @Transactional(readOnly = true)
+    @GetMapping("/productesModalByEmp/{codiEmp}")
+    @PreAuthorize("hasRole('USER')")
+    public List<InfoRegistres> getProductsByCodiEmp(@PathVariable(value = "codiEmp", required=false) String codiEmp){
+    	String vacio = "";
+    	Stream<PDU> pduStream = pduRepository.getDades("PRODUCTE", vacio);
+    	Empressa emp = empressaRepository.findByCodi(codiEmp);
+    	List<EmpressaProducte> empProdList = empressaProducteRepository.findAllStreamByEmpressa(emp);
+    	List<InfoRegistres> productes = new ArrayList<InfoRegistres>();
+    	List<String> prodTemp = new ArrayList<String>();
+    	for (EmpressaProducte prodFromEmpProdList : empProdList) {
+			prodTemp.add(prodFromEmpProdList.getTipusProducte());
+		}
+    	for (PDU registre : pduStream.collect(Collectors.toList())) {
+//			productes.add(registre.getDatos().substring(0, 25).trim());
+//			productes.add(registre.getClave());
+    		if (prodTemp.contains(registre.getDatos().substring(0, 25).trim())) {
     			InfoRegistres producte = new InfoRegistres();
         		producte.setClau(registre.getClave());
         		producte.setNom(registre.getDatos().substring(0, 25).trim());

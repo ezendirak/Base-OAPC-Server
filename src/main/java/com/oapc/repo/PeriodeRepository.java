@@ -40,4 +40,6 @@ public interface PeriodeRepository extends JpaRepository<Periode, Long> {
 	@Query("select p from Periode p where p.id IN (select periode from ProducteEmpressaPeriode y where y.empressaProducte IN (select id from EmpressaProducte h where h.tipusProducte = :tipusProd and h.empressa.codi = :empresa))")
 	List<Periode> getPeriodesByProductes(@Param("tipusProd") String tipusProd, @Param("empresa") String empresa);
 	
+	@Query("select p from Periode p where p.id IN (select periode from ProducteEmpressaPeriode y where (y.pendent = 1 or y.registrat = 1) and y.empressaProducte IN (select id from EmpressaProducte h where h.tipusProducte = :tipusProd and h.empressa.codi = :empresa))")
+	List<Periode> getPeriodesDisponiblesByProductes(@Param("tipusProd") String tipusProd, @Param("empresa") String empresa);
 }
