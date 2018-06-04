@@ -32,9 +32,8 @@ public class RegisterExcelDTO {
 //  @Column(name="CONT")
     private Float preuSortida;
     
-    @ManyToOne
-	@JoinColumn(name="empresaInformant", nullable = false)
-    private Empressa empressa;
+   
+    private String uInformant;
     
     public RegisterExcelDTO() {}
     
@@ -102,14 +101,6 @@ public class RegisterExcelDTO {
 	public void setQuantitatVenuda(Long quantitatVenuda) {
 		this.quantitatVenuda = quantitatVenuda;
 	}
-
-	public Empressa getEmpressa() {
-		return empressa;
-	}
-
-	public void setEmpressa(Empressa empressa) {
-		this.empressa = empressa;
-	}
 	
 	public Float getPreuSortida() {
 		return preuSortida;
@@ -117,6 +108,14 @@ public class RegisterExcelDTO {
 
 	public void setPreuSortida(Float preuSortida) {
 		this.preuSortida = preuSortida;
+	}
+
+	public String getuInformant() {
+		return uInformant;
+	}
+
+	public void setuInformant(String uInformant) {
+		this.uInformant = uInformant;
 	}
 
         

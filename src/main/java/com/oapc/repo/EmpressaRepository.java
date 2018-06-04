@@ -31,6 +31,9 @@ public interface EmpressaRepository extends JpaRepository<Empressa, Long> {
 	@Query("select p from Empressa p where p.id = (select empresa from User x where x.id = :userId)")
 	Empressa getCodiEmpByUserId(@Param("userId") Long userId);
 	
+	@Query("select p from Empressa p where p.id = (select empresa from User x where x.username = :userName)")
+	Empressa getEmpByUserName(@Param("userName") String userName);
+	
 	@Query("select p from Empressa p where p.estat=1")
 	List<Empressa> findAllActive();
 }

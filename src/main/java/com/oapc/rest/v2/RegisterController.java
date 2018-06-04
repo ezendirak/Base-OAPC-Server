@@ -195,14 +195,22 @@ public class RegisterController {
     @PostMapping("/fromExcelRegistres/{familia}")
     @PreAuthorize("hasRole('USER')")
     public Register createRegisterFromExcel(@PathVariable(value = "familia") Long familia, @Valid @RequestBody RegisterExcelDTO registre) {
+    	Empressa empFromUser = empressaRepository.getEmpByUserName(registre.getuInformant());
     	
+    	EmpressaProducte empProd = empressaProducteRepository.findAllListByProdAndEmpId(registre.getTipusProducte(), empFromUser);
     	if(!pduController.existeEn("PRODUCTE", registre.getTipusProducte())) {
     		//ERROR EN EL TIPUS DE PRODUCTE
     		logger.info("ERROR. El producte "+ registre.getTipusProducte() + " no està donat d'alta.");
 //    		ErrorRegister errorRegistre = new ErrorRegister();
 //    		errorRegistre.setTipusProducte(registre.getTipusProducte());
     		//funcio general per pasar de registre a Error
-    	}else if (!pduController.existeEn("COLORCARN", registre.getColorCarn()) && familia == 1) {
+    		//Comprovem que el producte que SI que existeix a la pdu, tmb existeix a la nostre empresa
+    	}else if (empProd == null) {
+    		//Aquesta empresa no te drets per aquest producte
+    		logger.info("ERROR. El producte "+ registre.getTipusProducte() + " no està donat d'alta per aquesta empresa.");
+    		return null;
+    	}
+    	if (!pduController.existeEn("COLORCARN", registre.getColorCarn()) && familia == 1) {
     		//ERROR EN EL COLOR DE LA CARN
     		logger.info("ERROR. El color de carn "+ registre.getColorCarn() + " no està donat d'alta.");
     		
@@ -223,10 +231,7 @@ public class RegisterController {
     		if (familia == 1) { peri = periodeRepository.findPeriodByNumType(registre.getPeriode(), "S"); }
     		else if (familia == 2) { peri = periodeRepository.findPeriodByNumType(registre.getPeriode(), "Q"); }
     		
-        	Empressa emp = empressaRepository.findOne(2L);
-//        	Empressa emp2 = empressaRepository.findById(1L);
-//        	long prova = registre.getPeriode();
-//        	logger.info(String.valueOf(prova));
+        	User usuari = userRepository.findByUsername(registre.getuInformant());
         	Register regi = new Register();
         	regi.setCalibre(registre.getCalibre());
         	regi.setColorCarn(registre.getColorCarn());
@@ -236,8 +241,14 @@ public class RegisterController {
         	regi.setQuantitatVenuda(registre.getQuantitatVenuda());
         	regi.setTipusProducte(registre.getTipusProducte());
         	regi.setPeriode(peri);
-//        	regi.setEmpressa(emp);
-        	return registreRepository.save(regi);
+        	regi.setUser(usuari);
+        	registreRepository.save(regi);
+        	
+        	
+        	ProducteEmpressaPeriode test = producteEmpressaPeriodeRepository.findByPeriodAndEmpProd(peri, empressaProducteRepository.findAllListByProdAndEmpId(registre.getTipusProducte(), usuari.getEmpresa()));
+            test.setDataUltimRegistre(new Timestamp(DateTime.now().getMillis()));
+            if (test.getPendent()){test.setPendent(false); test.setRegistrat(true);}
+            producteEmpressaPeriodeRepository.save(test);
     	}
     	//QUE FEM EN AQUEST CAS
         return null;
