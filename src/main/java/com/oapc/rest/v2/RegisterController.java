@@ -194,63 +194,67 @@ public class RegisterController {
 
     @PostMapping("/fromExcelRegistres/{familia}")
     @PreAuthorize("hasRole('USER')")
-    public Register createRegisterFromExcel(@PathVariable(value = "familia") Long familia, @Valid @RequestBody RegisterExcelDTO registre) {
-    	Empressa empFromUser = empressaRepository.getEmpByUserName(registre.getuInformant());
+    public Register createRegisterFromExcel(@PathVariable(value = "familia") Long familia, @Valid @RequestBody List<RegisterExcelDTO> registres) {
     	
-    	EmpressaProducte empProd = empressaProducteRepository.findAllListByProdAndEmpId(registre.getTipusProducte(), empFromUser);
-    	if(!pduController.existeEn("PRODUCTE", registre.getTipusProducte())) {
-    		//ERROR EN EL TIPUS DE PRODUCTE
-    		logger.info("ERROR. El producte "+ registre.getTipusProducte() + " no està donat d'alta.");
-//    		ErrorRegister errorRegistre = new ErrorRegister();
-//    		errorRegistre.setTipusProducte(registre.getTipusProducte());
-    		//funcio general per pasar de registre a Error
-    		//Comprovem que el producte que SI que existeix a la pdu, tmb existeix a la nostre empresa
-    	}else if (empProd == null) {
-    		//Aquesta empresa no te drets per aquest producte
-    		logger.info("ERROR. El producte "+ registre.getTipusProducte() + " no està donat d'alta per aquesta empresa.");
-    		return null;
-    	}
-    	if (!pduController.existeEn("COLORCARN", registre.getColorCarn()) && familia == 1) {
-    		//ERROR EN EL COLOR DE LA CARN
-    		logger.info("ERROR. El color de carn "+ registre.getColorCarn() + " no està donat d'alta.");
+    	for (RegisterExcelDTO registre : registres) {
     		
-    	}else if (!pduController.existeEn("VARIETAT", registre.getVarietat()) && familia == 2) {
-    		//ERROR EN LA VARIETAT
-    		logger.info("ERROR. La varietat "+ registre.getVarietat() + " no està donat d'alta.");
-    		
-    	}else if (!pduController.existeEn("QUALITAT", registre.getQualitat())) {
-    		//ERROR EN EL QUALITAT
-    		logger.info("ERROR. La qualitat "+ registre.getQualitat() + " no està donada d'alta.");
-    		
-    	}else if (!pduController.existeEn("CALIBRE", registre.getCalibre())) {
-    		//ERROR EN EL CALIBRE
-    		logger.info("ERROR. El calibre "+ registre.getCalibre() + " no està donat d'alta.");
-    		
-    	}else {
-    		Periode peri = new Periode();
-    		if (familia == 1) { peri = periodeRepository.findPeriodByNumType(registre.getPeriode(), "S"); }
-    		else if (familia == 2) { peri = periodeRepository.findPeriodByNumType(registre.getPeriode(), "Q"); }
-    		
-        	User usuari = userRepository.findByUsername(registre.getuInformant());
-        	Register regi = new Register();
-        	regi.setCalibre(registre.getCalibre());
-        	regi.setColorCarn(registre.getColorCarn());
-        	regi.setPreuSortida(registre.getPreuSortida());
-        	regi.setVarietat(registre.getVarietat());
-        	regi.setQualitat(registre.getQualitat());
-        	regi.setQuantitatVenuda(registre.getQuantitatVenuda());
-        	regi.setTipusProducte(registre.getTipusProducte());
-        	regi.setPeriode(peri);
-        	regi.setUser(usuari);
-        	registreRepository.save(regi);
-        	
-        	
-        	ProducteEmpressaPeriode test = producteEmpressaPeriodeRepository.findByPeriodAndEmpProd(peri, empressaProducteRepository.findAllListByProdAndEmpId(registre.getTipusProducte(), usuari.getEmpresa()));
-            test.setDataUltimRegistre(new Timestamp(DateTime.now().getMillis()));
-            if (test.getPendent()){test.setPendent(false); test.setRegistrat(true);}
-            producteEmpressaPeriodeRepository.save(test);
-    	}
+	    	Empressa empFromUser = empressaRepository.getEmpByUserName(registre.getuInformant());
+	    	
+	    	EmpressaProducte empProd = empressaProducteRepository.findAllListByProdAndEmpId(registre.getTipusProducte(), empFromUser);
+	    	if(!pduController.existeEn("PRODUCTE", registre.getTipusProducte())) {
+	    		//ERROR EN EL TIPUS DE PRODUCTE
+	    		logger.info("ERROR. El producte "+ registre.getTipusProducte() + " no està donat d'alta.");
+	//    		ErrorRegister errorRegistre = new ErrorRegister();
+	//    		errorRegistre.setTipusProducte(registre.getTipusProducte());
+	    		//funcio general per pasar de registre a Error
+	    		//Comprovem que el producte que SI que existeix a la pdu, tmb existeix a la nostre empresa
+	    	}else if (empProd == null) {
+	    		//Aquesta empresa no te drets per aquest producte
+	    		logger.info("ERROR. El producte "+ registre.getTipusProducte() + " no està donat d'alta per aquesta empresa.");
+	    		return null;
+	    	}
+	    	if (!pduController.existeEn("COLORCARN", registre.getColorCarn()) && familia == 1) {
+	    		//ERROR EN EL COLOR DE LA CARN
+	    		logger.info("ERROR. El color de carn "+ registre.getColorCarn() + " no està donat d'alta.");
+	    		
+	    	}else if (!pduController.existeEn("VARIETAT", registre.getVarietat()) && familia == 2) {
+	    		//ERROR EN LA VARIETAT
+	    		logger.info("ERROR. La varietat "+ registre.getVarietat() + " no està donat d'alta.");
+	    		
+	    	}else if (!pduController.existeEn("QUALITAT", registre.getQualitat())) {
+	    		//ERROR EN EL QUALITAT
+	    		logger.info("ERROR. La qualitat "+ registre.getQualitat() + " no està donada d'alta.");
+	    		
+	    	}else if (!pduController.existeEn("CALIBRE", registre.getCalibre())) {
+	    		//ERROR EN EL CALIBRE
+	    		logger.info("ERROR. El calibre "+ registre.getCalibre() + " no està donat d'alta.");
+	    		
+	    	}else {
+	    		Periode peri = new Periode();
+	    		if (familia == 1) { peri = periodeRepository.findPeriodByNumType(registre.getPeriode(), "S"); }
+	    		else if (familia == 2) { peri = periodeRepository.findPeriodByNumType(registre.getPeriode(), "Q"); }
+	    		
+	        	User usuari = userRepository.findByUsername(registre.getuInformant());
+	        	Register regi = new Register();
+	        	regi.setCalibre(registre.getCalibre());
+	        	regi.setColorCarn(registre.getColorCarn());
+	        	regi.setPreuSortida(registre.getPreuSortida());
+	        	regi.setVarietat(registre.getVarietat());
+	        	regi.setQualitat(registre.getQualitat());
+	        	regi.setQuantitatVenuda(registre.getQuantitatVenuda());
+	        	regi.setTipusProducte(registre.getTipusProducte());
+	        	regi.setPeriode(peri);
+	        	regi.setUser(usuari);
+	        	registreRepository.save(regi);
+	        	
+	        	
+	        	ProducteEmpressaPeriode test = producteEmpressaPeriodeRepository.findByPeriodAndEmpProd(peri, empressaProducteRepository.findAllListByProdAndEmpId(registre.getTipusProducte(), usuari.getEmpresa()));
+	            test.setDataUltimRegistre(new Timestamp(DateTime.now().getMillis()));
+	            if (test.getPendent()){test.setPendent(false); test.setRegistrat(true);}
+	            producteEmpressaPeriodeRepository.save(test);
+	    	}
     	//QUE FEM EN AQUEST CAS
+    	}
         return null;
     }
     
@@ -372,13 +376,13 @@ public class RegisterController {
     {    	    	 
 //    	 Stream<Register> registresTotals = registreRepository.findAllStream();
     	List<Register> registresTotals = new ArrayList<Register>();
-    	if (eInformant == null) {
-    		registresTotals = registreRepository.findAll();
-    	}
-    	else {
-    		Empressa emp = empressaRepository.findByCodi(eInformant);
-       	 	registresTotals = registreRepository.findAllByEmp(emp);
-    	}
+//    	if (eInformant == null) {
+    	registresTotals = registreRepository.findAll();
+//    	}
+//    	else {
+//    		Empressa emp = empressaRepository.findByCodi(eInformant);
+//       	 	registresTotals = registreRepository.findAllByEmp(emp);
+//    	}
     	 
 //    	 Empressa emp = empressaRepository.findByCodi(eInformant);
 //    	 List<Register> registresTotals = registreRepository.findAllByEmp(emp);
@@ -399,8 +403,8 @@ public class RegisterController {
     	 
 //    	 Long    total_reg = stream_cont.count();
     	 Long    total_reg = registresTotals.stream().count();
-    	 Long    page_max  = (total_reg / per_page) + 1;
-    	 Integer skip_reg  = (page - 1) * per_page;    	 
+    	 Long    page_max  = (total_reg / per_page) + 1; //Math.ceil(a) redondeo hacia arriba
+     	 Integer skip_reg  = (page - 1) * per_page;    	 
 	     	     	     	     
 	     if (page > page_max)
 	    	 return new ResponseEntity<ErrorRest > (new ErrorRest("page > page_max"), HttpStatus.BAD_REQUEST);
@@ -469,6 +473,7 @@ public class RegisterController {
 	              .filter(x -> pSortida == null		 	|| 	x.getPreuSortida() > Long.valueOf(pSortida))
 	              .filter(x -> pSortida2 == null		|| 	x.getPreuSortida() < Long.valueOf(pSortida2))
 	              .filter(x -> uInformant == null		||	x.getUser().getUsername().equals(uInformant))
+	              .filter(x -> eInformant == null		||	x.getUser().getEmpresa().equals(empressa))
 	              .collect(Collectors.toList());
     	
     	if (periode != null) {

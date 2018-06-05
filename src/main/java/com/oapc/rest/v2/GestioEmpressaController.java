@@ -552,12 +552,12 @@ public class GestioEmpressaController {
     @GetMapping("/registresPEP_count")
     @PreAuthorize("hasRole('USER')")
     public Long getRegisterPEPCountFiltrat(@RequestParam(value = "periode", required=false) String periode, @RequestParam(value="tipusProducte", required=false) String tipusProducte, 
-    		@RequestParam(value="empressa", required=false) String empressa, @RequestParam(value="estat", required=false) String estat)	    		    		    	
+    		@RequestParam(value="empresa", required=false) String empresa, @RequestParam(value="estat", required=false) String estat)	    		    		    	
     {    
     	
     	 List<ProducteEmpressaPeriode> registresTotals = producteEmpressaPeriodeRepository.findAll();
     	 
-    	 registresTotals = filtrarAtributs(tipusProducte, periode, empressa, estat, registresTotals);
+    	 registresTotals = filtrarAtributs(tipusProducte, periode, empresa, estat, registresTotals);
     	
     	 return registresTotals.stream().count();
     }
@@ -565,10 +565,11 @@ public class GestioEmpressaController {
     
     public List<ProducteEmpressaPeriode> filtrarAtributs(String tipusProducte, String periode, String empressa, String estat, List<ProducteEmpressaPeriode> registresTotals){
     	
-    	
+    	Empressa empresa = empressaRepository.findByCodi(empressa);
+//    	List<EmpressaProducte> empProdList = empressaProducteRepository.findAllStreamByEmpressa(empresa);
     	registresTotals = registresTotals.stream()
     			  .filter(x -> tipusProducte == null || x.getEmpressaProducte().getTipusProducte().equals(tipusProducte))
-	              .filter(x -> empressa  == null     || x.getEmpressaProducte().getEmpressa().getCodi().equals(empressa))
+	              .filter(x -> empresa  == null     || x.getEmpressaProducte().getEmpressa().equals(empresa))
 	              .collect(Collectors.toList());
     	
     	if(estat != null) {
