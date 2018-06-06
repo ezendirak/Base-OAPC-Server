@@ -39,8 +39,6 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping("/api/v5")
 public class GestioPeriodeController {
-
-	private String[] combos = {"COLORCARN", "VARIETAT", "QUALITAT", "CALIBRE"};
 	
 	private final Logger logger = LoggerFactory.getLogger(GestioPeriodeController.class);
 	
@@ -111,6 +109,7 @@ public class GestioPeriodeController {
 					//El nou periode introduït te el mateix numero i tipus de periode que un periode existent
 					periodesErrors.add(periode);
 					//TODO enrregistrar els errors  (log o per pantalla)
+					
 				}
 			}
 		}
@@ -131,19 +130,6 @@ public class GestioPeriodeController {
 	 return registresTotals;
     }
     
-    
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////FORMAT///////////////////////////////////////////////////////
-    
-    public void convertDate(Long data) {
-    	Instant instant = Instant.ofEpochMilli(data);
-//    	ZonedDateTime z = instant.atZone(ZoneId.of("Australia/Sydney"));
-    	// format it
-    	logger.info(String.valueOf(data));
-    	DateTimeFormatter fmt = DateTimeFormatter.ofPattern("hh:mm dd/MM/yyyy");
-    	System.out.println(fmt.format(instant));
-    	logger.info(String.valueOf(instant));
-    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////PAGINATION////////////////////////////////////////////////////
     

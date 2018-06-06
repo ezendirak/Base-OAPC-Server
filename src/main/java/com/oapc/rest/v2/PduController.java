@@ -352,8 +352,6 @@ public class PduController {
 			prodTemp.add(prodFromEmpProdList.getTipusProducte());
 		}
     	for (PDU registre : pduStream.collect(Collectors.toList())) {
-//			productes.add(registre.getDatos().substring(0, 25).trim());
-//			productes.add(registre.getClave());
     		if (prodTemp.contains(registre.getDatos().substring(0, 25).trim())) {
     			InfoRegistres producte = new InfoRegistres();
         		producte.setClau(registre.getClave());
@@ -705,7 +703,7 @@ public class PduController {
     	return atributsCombo;
     }
     
-public AtributsCombo combosAmbProducteModalToAdd(String producteKey, AtributsCombo atributsCombo) {
+    public AtributsCombo combosAmbProducteModalToAdd(String producteKey, AtributsCombo atributsCombo) {
     	
     	for (String atribut : combos) {
     		

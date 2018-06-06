@@ -165,7 +165,7 @@ public class RegisterController {
 //    private String[] combos = {"COLORCARN", "VARIETAT", "QUALITAT", "CALIBRE"};
     @PostMapping("/registres")
     @PreAuthorize("hasRole('USER')")
-    public void createRegister(@Valid @RequestBody RegisterDTO registre) {
+    public ResponseEntity<?> createRegister(@Valid @RequestBody RegisterDTO registre) {
     	Periode peri = periodeRepository.findOne(Long.valueOf(registre.getPeriode().getId()));
     	User usuariRegistrador = userRepository.findByUsername(registre.getUsuName());
 
@@ -180,7 +180,7 @@ public class RegisterController {
     	regi.setPeriode(peri);
     	regi.setUser(usuariRegistrador);
 //    	regi.setEmpressa(emp);
-        registreRepository.save(regi);
+        Register newRegi = registreRepository.save(regi);
         
         //Comprovem data ultim registre (ProdEmpPer)
 
@@ -188,13 +188,13 @@ public class RegisterController {
         test.setDataUltimRegistre(new Timestamp(DateTime.now().getMillis()));
         if (test.getPendent()){test.setPendent(false); test.setRegistrat(true);}
         producteEmpressaPeriodeRepository.save(test);
-        
+        return ResponseEntity.ok(newRegi);
     }
     
 
     @PostMapping("/fromExcelRegistres/{familia}")
     @PreAuthorize("hasRole('USER')")
-    public Register createRegisterFromExcel(@PathVariable(value = "familia") Long familia, @Valid @RequestBody List<RegisterExcelDTO> registres) {
+    public ResponseEntity<?> createRegisterFromExcel(@PathVariable(value = "familia") Long familia, @Valid @RequestBody List<RegisterExcelDTO> registres) {
     	
     	for (RegisterExcelDTO registre : registres) {
     		
@@ -211,7 +211,7 @@ public class RegisterController {
 	    	}else if (empProd == null) {
 	    		//Aquesta empresa no te drets per aquest producte
 	    		logger.info("ERROR. El producte "+ registre.getTipusProducte() + " no està donat d'alta per aquesta empresa.");
-	    		return null;
+	    		return ResponseEntity.notFound().build();
 	    	}
 	    	if (!pduController.existeEn("COLORCARN", registre.getColorCarn()) && familia == 1) {
 	    		//ERROR EN EL COLOR DE LA CARN
@@ -245,17 +245,18 @@ public class RegisterController {
 	        	regi.setTipusProducte(registre.getTipusProducte());
 	        	regi.setPeriode(peri);
 	        	regi.setUser(usuari);
-	        	registreRepository.save(regi);
+	        	Register newRegi = registreRepository.save(regi);
 	        	
 	        	
 	        	ProducteEmpressaPeriode test = producteEmpressaPeriodeRepository.findByPeriodAndEmpProd(peri, empressaProducteRepository.findAllListByProdAndEmpId(registre.getTipusProducte(), usuari.getEmpresa()));
 	            test.setDataUltimRegistre(new Timestamp(DateTime.now().getMillis()));
 	            if (test.getPendent()){test.setPendent(false); test.setRegistrat(true);}
 	            producteEmpressaPeriodeRepository.save(test);
+	            return ResponseEntity.ok(newRegi);
 	    	}
     	//QUE FEM EN AQUEST CAS
     	}
-        return null;
+    	return ResponseEntity.notFound().build();
     }
     
     @PostMapping("/downloadToExcel")
@@ -378,14 +379,7 @@ public class RegisterController {
     	List<Register> registresTotals = new ArrayList<Register>();
 //    	if (eInformant == null) {
     	registresTotals = registreRepository.findAll();
-//    	}
-//    	else {
-//    		Empressa emp = empressaRepository.findByCodi(eInformant);
-//       	 	registresTotals = registreRepository.findAllByEmp(emp);
-//    	}
-    	 
-//    	 Empressa emp = empressaRepository.findByCodi(eInformant);
-//    	 List<Register> registresTotals = registreRepository.findAllByEmp(emp);
+
     	 List<RegisterDTO> regis = new ArrayList<RegisterDTO>();
     	 registresTotals = filtrarAtributs(tipusProducte, colorCarn, qualitat, calibre, varietat, periode, registresTotals, qVenuda, qVenuda2, pSortida, pSortida2, eInformant, uInformant);
     	 
@@ -398,19 +392,13 @@ public class RegisterController {
    	 	     	    	
 	     if (per_page == 0)
 	    	 return new ResponseEntity<ErrorRest> (new ErrorRest("per_page not defined"), HttpStatus.BAD_REQUEST);	     
-	     //
-//    	 Stream<Register> stream_cont = registreRepository.findAllStream();
-    	 
-//    	 Long    total_reg = stream_cont.count();
+	   
     	 Long    total_reg = registresTotals.stream().count();
     	 Long    page_max  = (total_reg / per_page) + 1; //Math.ceil(a) redondeo hacia arriba
      	 Integer skip_reg  = (page - 1) * per_page;    	 
 	     	     	     	     
 	     if (page > page_max)
 	    	 return new ResponseEntity<ErrorRest > (new ErrorRest("page > page_max"), HttpStatus.BAD_REQUEST);
-    	
-    	 //
-//    	 Stream<Register> stream_data = registreRepository.findAllStream();    	     	     	
 	     
 	     logger.info("page=" + page.toString() + ",page_max=" + page_max.toString() + ",per_page=" + per_page.toString() + ",total_reg=" +  total_reg.toString());	    
 	     //logger.info(registresTotals.get(0).toString()); 
@@ -433,6 +421,7 @@ public class RegisterController {
  	        test.setQualitat(register.getQualitat());
  	        test.setQuantitatVenuda(register.getQuantitatVenuda());
  	        test.setVarietat(register.getVarietat());
+ 	        test.setUsuName(register.getUser().getUsername());
  	        regis.add(test);
 			}
 	     if (page == 0)	    	
@@ -546,7 +535,6 @@ public class RegisterController {
     		}
     	}
     	
-//    	return streamPeriode.collect(Collectors.toList());
     	return periodesList;
     }
     
@@ -557,7 +545,6 @@ public class RegisterController {
     @PreAuthorize("hasRole('USER')")
     public List<PeriodeDTO> getPeriodesByProd(@PathVariable(value = "subGrup", required=false) String subGrup){
     	
-
     	Stream<Periode> streamPeriode = periodeRepository.getDatesDisponibles();
     	if (subGrup.equals("PI")) {
     		streamPeriode = streamPeriode.filter(x -> x.getTipusPeriode().equals("S"));
@@ -578,18 +565,15 @@ public class RegisterController {
 			temp.setTipusPeriode(peri.getTipusPeriode());
 			periodesList.add(temp);
 		}
-//    	return streamPeriode.collect(Collectors.toList());
     	return periodesList;
     }
     
-//    @PathVariable(value = "subGrup", required=false) String subGrup
     
     @Transactional(readOnly = true)
     @GetMapping("/periByProductes/")
     @PreAuthorize("hasRole('USER')")
     public List<PeriodeDTO> getPerByProducte(@RequestParam(value="tipusProducte", required=false) String tipusProd, @RequestParam(value="empresa", required=false) String empresa){
     	
-
     	List<Periode> periodesDisponibles = periodeRepository.getPeriodesByProductes(tipusProd, empresa);
     	
     	
@@ -606,7 +590,6 @@ public class RegisterController {
 			temp.setTipusPeriode(peri.getTipusPeriode());
 			periodesList.add(temp);
 		}
-//    	return streamPeriode.collect(Collectors.toList());
     	return periodesList;
     }
     
@@ -615,9 +598,7 @@ public class RegisterController {
     @PreAuthorize("hasRole('USER')")
     public List<PeriodeDTO> getPerByProdAndEmp(@RequestParam(value="tipusProducte", required=false) String tipusProd, @RequestParam(value="empresa", required=false) String empresa){
     	
-
     	List<Periode> periodesDisponibles = periodeRepository.getPeriodesDisponiblesByProductes(tipusProd, empresa);
-    	
     	
     	List<PeriodeDTO> periodesList = new ArrayList<PeriodeDTO>();
     	

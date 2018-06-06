@@ -334,29 +334,34 @@ public class GestioEmpressaController {
     @Transactional(readOnly = false)
     @PutMapping("/gestioPeriode")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ProducteEmpressaPeriode> updatePeriodeProdEmp(@Valid @RequestBody List<String> productes) {
+    public ResponseEntity<?> updatePeriodeProdEmp(@Valid @RequestBody List<String> productes) {
     	List<ProducteEmpressaPeriode> registres = producteEmpressaPeriodeRepository.findAllListByProd(productes);
-    	for (ProducteEmpressaPeriode producteEmpressaPeriode : registres) {
-			producteEmpressaPeriode.setTancat(true);
-			producteEmpressaPeriode.setNo_comercialitzacio(false);
-			producteEmpressaPeriode.setPendent(false);
-			producteEmpressaPeriode.setRegistrat(false);
-			
-			producteEmpressaPeriode = producteEmpressaPeriodeRepository.save(producteEmpressaPeriode);
-		}
-    	return null;
+    	if(registres != null) {
+    		for (ProducteEmpressaPeriode producteEmpressaPeriode : registres) {
+				producteEmpressaPeriode.setTancat(true);
+				producteEmpressaPeriode.setNo_comercialitzacio(false);
+				producteEmpressaPeriode.setPendent(false);
+				producteEmpressaPeriode.setRegistrat(false);
+				
+				producteEmpressaPeriode = producteEmpressaPeriodeRepository.save(producteEmpressaPeriode);
+			}
+    		return ResponseEntity.ok(registres); 
+    	}
+	    	
+    	return ResponseEntity.notFound().build();
     }
     
     
     @Transactional(readOnly = false)
     @PutMapping("/deleteEmpresa")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ProducteEmpressaPeriode> deleteEmp(@Valid @RequestBody InfoEmpressa empresa) {
+    public ResponseEntity<Empressa> deleteEmp(@Valid @RequestBody InfoEmpressa empresa) {
     	Empressa emp = empressaRepository.findById(empresa.getId());
     	if (emp != null) {
     		emp.setEstat(0);
+    		return ResponseEntity.ok(emp);
     	}
-    	return null;
+    	return ResponseEntity.notFound().build();
     }
     
     @Transactional(readOnly = false)
@@ -379,15 +384,13 @@ public class GestioEmpressaController {
     @Transactional(readOnly = false)
     @PutMapping("/regNoComPer")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Empressa> updateRegNoComPer(@Valid @RequestBody RegistreNoComPerDTO registre) {
+    public ResponseEntity<ProducteEmpressaPeriode> updateRegNoComPer(@Valid @RequestBody RegistreNoComPerDTO registre) {
 
-//    	Empressa emp = empressaRepository.findByCodi(registre.getEmpresa());
-//    	EmpressaProducte temporal = empressaProducteRepository.findAllListByProdAndEmpId(registre.getProducte(), emp);
     	Periode emp = periodeRepository.findOne(registre.getPeriode());
     	ProducteEmpressaPeriode test = producteEmpressaPeriodeRepository.findByPerProdAndCodiEmp(emp, registre.getProducte(), registre.getEmpresa());
     	test.setNo_comercialitzacio(true);
     	producteEmpressaPeriodeRepository.save(test);
-    	return null;
+    	return ResponseEntity.ok(test);
     }
     
     
